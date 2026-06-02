@@ -33,33 +33,23 @@ This project employs a **multi-source data acquisition pipeline** to build a com
    - **Research Repositories**: Papers related to neural networks, computer vision, language models, and Tesla Autopilot research.
    - **Processing**: Full-text PDFs are downloaded, converted to markdown, and chunked into semantic units.
 
-#### 2. **YouTube Transcripts**
-   - **Neural Networks: Zero to Hero Course**: Complete transcripts from Andrej's canonical deep learning course (Lectures 1–8).
-   - **Conference Talks & Keynotes**: Transcripts from NeurIPS, ICML, and other major ML conferences.
-   - **Podcast Appearances**: Episodes from Lex Fridman Podcast, AI podcast, and other technical interview shows.
-   - **Processing**: YouTube captions are downloaded and aligned with video segments; raw transcripts are cleaned and segmented by topic.
-
-#### 3. **Twitter / X Posts**
+#### 2. **Twitter / X Posts**
    - **Tweet Scraping**: Curator tweets and retweets from Andrej's X account (`@karpathy`).
    - **Context Capture**: Each tweet is enriched with engagement metrics (likes, retweets), reply threads, and timestamps.
    - **Filtering**: Tweets are filtered for technical content, insights, and public reflections on AI, ML, and product development.
    - **Processing**: Threads are reconstructed and stored as coherent narrative blocks with source attribution.
 
-#### 4. **GitHub Repositories**
+#### 3. **GitHub Repositories**
    - **Public Code**: Repositories including `micrograd`, `nanoGPT`, `char-rnn`, and Tesla Autopilot-related projects.
    - **README & Documentation**: All markdown documentation, code comments, and project descriptions.
    - **Commit History**: Commit messages and code evolution to understand design decisions.
    - **Processing**: Code is indexed with a special "code-source" boost weight; inline comments and docstrings are extracted as knowledge atoms.
 
-#### 5. **Blog Posts & Articles**
+#### 4. **Blog Posts & Articles**
    - **Personal Blog**: Posts from Andrej's personal website and Medium articles.
    - **Technical Write-ups**: In-depth articles on topics like neural networks, transformers, and software engineering best practices.
    - **Processing**: HTML is converted to markdown; metadata includes publication date for temporal filtering.
 
-#### 6. **Interviews & Q&A Sessions**
-   - **Public Interviews**: Curated transcripts from interviews discussing philosophy, career, and AI safety.
-   - **Reddit / Hacker News**: Notable comments and discussions on technical threads.
-   - **Processing**: Context is preserved; usernames are anonymized; high-quality technical discussions are extracted.
 
 ### Data Collection Pipeline (`data_collection/`)
 
