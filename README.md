@@ -40,7 +40,7 @@ The digital twin is accessed through an interactive dark-mode web interface powe
 
 The system is constructed as a structured pipeline of modular subsystems. Rather than sending raw text directly to an LLM, the orchestrator stages and contextualizes the query through several independent processing stages, each designed to enforce semantic fidelity and prevent hallucination drift.
 
-![System Architecture & Process Flow](SYSTEM_ARCHITECHTURE.png)
+![System Architecture & Process Flow](dashboard/SYSTEM_ARCHITECHTURE.png)
 
 ### 1. The Persona & Outbound Validator (`agent/`)
 - **System Prompt**: Structures the identity, vocabulary (e.g., using builder terms like *"literally," "under the hood," "beautifully simple"*), and deep-seated core beliefs (e.g., *"you must build everything from scratch to truly understand"*).
