@@ -52,7 +52,6 @@ This project employs a **multi-source data acquisition pipeline** to build a com
 
 
 
-```
 
 ### Data Processing & Embedding Pipeline (`scripts/ingest_documents.py`)
 
@@ -63,13 +62,6 @@ This project employs a **multi-source data acquisition pipeline** to build a com
 5. **Vector Store Ingestion**: Embeddings are indexed in ChromaDB with full-text search support and metadata filtering.
 6. **Source Boosting**: Primary sources (papers, official repos, verified talks) receive a 1.3x relevance boost in retrieval rankings.
 
-**Running the Ingestion Pipeline:**
-
-```bash
-python scripts/ingest_documents.py --sources all --rebuild-db
-```
-
----
 
 ## 🎨 Project Interface
 
