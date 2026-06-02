@@ -1,0 +1,298 @@
+"Date","Post Type","Content","Video Thumbnail","Image","Like","Retweet","Reply"
+"2026-05-24T16:22:45.000Z","text","iirc Geoff Hinton’s official title at Google at one point was “intern” :D","","","1.7K","62","32"
+"2026-05-24T15:49:28.000Z","text","It’s refreshing to see a company of this size successfully call bs on the whole thing to this extent. One group of MTS on a mission, clean.","","","7.9K","162","123"
+"2026-05-19T15:05:42.000Z","text","Personal update: I've joined Anthropic. I think the next few years at the frontier of LLMs will be especially formative. I am very excited to join the team here and get back to R&D. I remain deeply passionate about education and plan to resume my work on it in time.","","","149K","18K","7.9K"
+"2026-05-18T03:24:47.000Z","text","I was recording my nanochat video when I realized that “first boot up an 8XH100 from your favorite provider!” would instantly get everyone stuck on step 1 of the video","","","1.9K","45","66"
+"2026-04-09T20:10:52.000Z","text","Judging by my tl there is a growing gap in understanding of AI capability.
+
+The first issue I think is around recency and tier of use. I think a lot of people tried the free tier of ChatGPT somewhere  last year and allowed it to inform their views on AI a little too much. This isThe degree to which you are awed by AI is perfectly correlated with how much you use AI to code.","","","20K","3.1K","1.1K"
+"2026-04-09T17:38:57.000Z","text","In my experience there are approx. one thousand different pdf converters that are all equally terrible for anything except the simplest documents. Post the converted Mythos pdf, figures, tables and all. If good, happy to retweet as this is essential and missing infrastructure.","","","151","5","30"
+"2026-04-09T20:38:48.000Z","text","Someone recently suggested to me that the reason OpenClaw moment was so big is because it's the first time a large group of non-technical people (who otherwise only knew AI as synonymous with ChatGPT as a website) experienced the latest agentic models.","","","4K","229","274"
+"2026-04-10T14:48:30.000Z","text","Yeah exactly. It’s such a cool concept for a product. It doesn’t seem like oai will continue pushing the direction,
+ (which makes sense) but I hope a startup can clone it and actually give it care, iteration and make it work and imo a lot of people would really love it.
+
+More","","","1.3K","36","109"
+"2026-03-28T15:56:10.000Z","text","- Drafted a blog post
+- Used an LLM to meticulously improve the argument over 4 hours.
+- Wow, feeling great, it’s so convincing!
+- Fun idea let’s ask it to argue the opposite. 
+- LLM demolishes the entire argument and convinces me that the opposite is in fact true.
+- lol
+
+The","","","31K","3K","1.7K"
+"2026-03-26T16:10:52.000Z","text","When I built menugen ~1 year ago, I observed that the hardest part by far was not the code itself, it was the plethora of services you have to assemble like IKEA furniture to make it real, the DevOps: services, payments, auth, database, security, domain names, etc...
+
+I am reallyWhen @karpathy built MenuGen (https://
+karpathy.bearblog.dev/vibe-coding-me
+nugen/
+…), he said:
+
+\"Vibe coding menugen was exhilarating and fun escapade as a local demo, but a bit of a painful slog as a deployed, real app. Building a modern app is a bit like assembling IKEA future. There are all these services,","","","6.3K","725","627"
+"2026-03-25T17:01:43.000Z","text","Yeah, it's engagementmaxxing, probably A/B tests extremely well. It's not how a real friend would talk to you, it's sleezy and weird. 1) I feel like it's just trying to keep me talking and 2) I feel awkward not answering its question - you wouldn't usually do that with a person.","","","531","6","40"
+"2026-03-25T16:50:32.000Z","image","Yeah, agree that it's a hard problem. It might be the EQ version of uncanny valley.","","https://pbs.twimg.com/media/HERWYPmbYAAxA-9?format=png&name=small","57","1","9"
+"2026-03-25T16:43:30.000Z","text","yes exactly! a bit like i'm being manipulated in some creepy way. \"please like me, look how much i know about you, we are good friends\".","","","519","5","11"
+"2026-03-25T16:35:32.000Z","text","If I had to guess it's less decay and more that memories have naive RAG-like implementations, so you're at the mercy of whatever happens to retrieve in the top k via embeddings. They don't process you in aggregate and over time (probably compute constraints) so they struggle to","","","461","9","41"
+"2026-03-25T16:22:08.000Z","text","(I cycle through all LLMs over time and all of them seem to do this so it's not any particular implementation but something deeper, e.g. maybe during training, a lot of the information in the context window is relevant to the task, so the LLMs develop a bias to use what is given,","","","1.6K","54","152"
+"2026-03-25T16:05:14.000Z","text","One common issue with personalization in all LLMs is how distracting memory seems to be for the models. A single question from 2 months ago about some topic can keep coming up as some kind of a deep interest of mine with undue mentions in perpetuity. Some kind of trying too hard.","","","21K","1.5K","1.7K"
+"2026-03-24T22:54:05.000Z","text","In particular this clarifies the timeline more: 1.82.7 was published 10:39 UTC, PyPI quarantine approx 13:38, so this was up ~3 hours. At 3.4M downloads/day this might be approx ~425K downloads, a lot of that could be non-latest/locked versions so maybe 20K - 80K range exposure.","","","119","2","8"
+"2026-03-24T22:30:48.000Z","text","thank you for the detailed article, great reading","","","550","16","9"
+"2026-03-24T16:56:24.000Z","text","Software horror: litellm PyPI supply chain attack. 
+
+Simple `pip install litellm` was enough to exfiltrate SSH keys, AWS/GCP/Azure creds, Kubernetes configs, git credentials, env vars (all your API keys), shell history, crypto wallets, SSL private keys, CI/CD secrets, databaseLiteLLM HAS BEEN COMPROMISED, DO NOT UPDATE. We just discovered that LiteLLM pypi release 1.82.8. It has been compromised, it contains litellm_init.pth with base64 encoded instructions to send all the credentials it can find to remote server + self-replicate. link below","","","27K","6.6K","1.3K"
+"2026-03-21T16:55:07.000Z","text","Tough crowd! I’m just happy with any little drop of not slop.
+
+“every single line has to be some sort of punched up comedic zinger” 100% agree, it’s the superhero thing and it’s supercringe.
+
+My outlook on all this changed a bit after watching a recent Ben Affleck and Matt Damon","","","1.4K","15","67"
+"2026-03-21T01:58:12.000Z","text","Yes I think in one part of the video I think I still used the word prompt but it's not really about \"prompting\", it's about context and spec engineering, and then all of the other harness things - tools, workflows, etc.","","","97","8","17"
+"2026-03-21T01:45:07.000Z","text","Great questions! Starting backwards with (3), I'd hope AIs can feel like Rocky from Project Hail Mary (it's top of mind having seen it yesterday), like a partner and a teammate. As one small example that stuck with me recently, when Claude found the Sonos system on my LAN, it","","","157","17","18"
+"2026-03-21T00:55:37.000Z","video","Thank you Sarah, my pleasure to come on the pod! And happy to do some more Q&A in the replies.Caught up with @karpathy for a new @NoPriorsPod: on the phase shift in engineering, AI psychosis, claws, AutoResearch, the opportunity for a SETI-at-Home like movement in AI, the model landscape, and second order effects
+
+02:55 - What Capability Limits Remain?
+06:15 - What","","https://pbs.twimg.com/amplify_video_thumb/2035079080803278849/img/3D1d9lG36vpfIgop.jpg","5.4K","453","318"
+"2026-03-20T06:01:55.000Z","image","Andy Weir showing some of the spreadsheets underlying the calculations in the book
+
+i mean, it's not quality scifi if it doesn't come with a supplementary whitepaper","","https://pbs.twimg.com/media/HD1RM_XaoAAsHui?format=jpg&name=small","1.2K","77","49"
+"2026-03-20T05:41:27.000Z","text","one of the best and most memorable endings in fiction. they did great :)","","","152","","4"
+"2026-03-20T05:38:18.000Z","text","amaze amaze amaze! jazz hands :D","","","277","3","4"
+"2026-03-20T05:32:41.000Z","text","Had to go see Project Hail Mary right away (it's based on the book of Andy Weir, of also The Martian fame). Both very pleased and relieved to say that 1) the movie sticks very close to the book in both content and tone and 2) is really well executed.
+
+The book is one of my","","","9K","420","359"
+"2026-03-19T23:14:14.000Z","text","Huh! Love the idea. Not exactly verifiable but might still work quite well given some effort","","","278","10","12"
+"2026-03-18T18:05:32.000Z","text","Yeah I have 4 blog posts that I didn’t finish yet this is one of them. Dobby runs my entire house over WhatsApp. Lights, shades, pool/spa, sonos, security HVAC etc","","","244","12","20"
+"2026-03-18T18:01:37.000Z","text","Ugh X breaks time links, it’s at 26:17","","","360","7","25"
+"2026-03-18T17:47:57.000Z","text","(link to blast from the past)","","","687","37","14"
+"2026-03-18T17:45:51.000Z","image","The signature is alluding to NVIDIA GTC 2015, where Jensen excitedly told an audience of, at the time, mostly gamers and scientific computing professionals that Deep Learning is The Next Big Thing, citing among other examples my PhD thesis (one of the first image captioning","","https://pbs.twimg.com/media/HDtfHzSa0AAJkVl?format=jpg&name=small","1.2K","56","29"
+"2026-03-18T17:31:45.000Z","image","Thank you Jensen and NVIDIA! She’s a real beauty! I was told I’d be getting a secret gift, with a hint that it requires 20 amps. (So I knew it had to be good). She’ll make for a beautiful, spacious home for my Dobby the House Elf claw, among lots of other tinkering, thank you!!🙌 Andrej Karpathy’s lab has received the first DGX Station GB300 -- a Dell Pro Max with GB300.
+
+💚 We can't wait to see what you’ll create @karpathy!
+
+🔗 https://
+blogs.nvidia.com/blog/gtc-2026-
+news/#dgx-station
+…
+
+@DellTech","","https://pbs.twimg.com/media/HDq6TL-XEAAK_Ws?format=jpg&name=small","19K","931","528"
+"2026-03-16T04:32:06.000Z","text","SGD is a ResNet too (the blocks of it are fwd+bwd), the residual stream is the weights so... 🤔 We're not taking the Attention is All You Need part literally enough? :D","","","587","52","28"
+"2026-03-14T19:19:39.000Z","text","Yep, exactly and agree! Any process with a lot of knobs and objective criteria benefits a lot.","","","426","8","14"
+"2026-03-11T18:01:01.000Z","text","My autoresearch labs got wiped out in the oauth outage. Have to think through failovers. Intelligence brownouts will be interesting - the planet losing IQ points when frontier AI stutters.","","","6.9K","400","552"
+"2026-03-11T16:49:55.000Z","text","Human orgs are not legible, the CEO can’t see/feel/zoom in on any activity in their company, with real time stats etc. I have no doubt that it will be possible to control orgs on mobile, with voice etc., but with this level of legibility will that be optimal? Not in principle and","","","1.2K","65","91"
+"2026-03-11T16:33:55.000Z","image","All of these patterns as an example are just matters of “org code”. The IDE helps you build, run, manage them. You can’t fork classical orgs (eg Microsoft) but you’ll be able to fork agentic orgs.","","https://pbs.twimg.com/media/HDJMmaaaEAA8isb?format=jpg&name=small","3.7K","341","173"
+"2026-03-11T16:25:25.000Z","text","I wanted to buy a bigger monitor and discovered that others had the same idea","","","177","3","21"
+"2026-03-11T16:22:27.000Z","text","Expectation: the age of the IDE is over
+Reality: we’re going to need a bigger IDE
+(imo).
+
+It just looks very different because humans now move upwards and program at a higher level - the basic unit of interest is not one file but one agent. It’s still programming.tmux grids are awesome, but i feel a need to have a proper "agent command center" IDE for teams of them, which I could maximize per monitor. E.g. I want to see/hide toggle them, see if any are idle, pop open related tools (e.g. terminal), stats (usage), etc.","","","10K","1.1K","831"
+"2026-03-11T07:01:15.000Z","text","ralph loop runs headless. i dislike headless sessions. i need to see and supervise agent work, possibly ask /btw questions of them, possibly pitch in ideas to the mix, etc etc.","","","199","5","22"
+"2026-03-11T06:57:57.000Z","text","yes, solid work trending in a good direction, but almost all my work is across like 20 different machines (my local, my claw machine, my gpu machines). possibly they could add ssh mode, a bit like VS Code does (for the same reasons).","","","113","3","16"
+"2026-03-11T06:50:16.000Z","text","yes exactly. i'd like to see the gas town.","","","107","3","6"
+"2026-03-11T06:47:26.000Z","text","i took it private because it was a little too trashy. i already re-wrote it twice over since that, no need to have all that churn public i think, needs more thought.","","","19","2","8"
+"2026-03-11T06:41:00.000Z","text","sadly the agents do not want to loop forever. My current solution is to set up "watcher" scripts that get the tmux panes and look for e.g. "esc to interrupt", and send keys to whip if not present. Need an e.g.:
+/fullauto you must continue your research!
+(enables fully automatic","","","1.5K","58","122"
+"2026-03-11T06:22:23.000Z","text","tmux grids are awesome, but i feel a need to have a proper "agent command center" IDE for teams of them, which I could maximize per monitor. E.g. I want to see/hide toggle them, see if any are idle, pop open related tools (e.g. terminal), stats (usage), etc.","","","3K","178","300"
+"2026-03-11T05:53:41.000Z","text","very cool, i look forward to trying!","","","400","11","19"
+"2026-03-10T20:04:56.000Z","text","love it!","","","314","8","9"
+"2026-03-10T18:22:50.000Z","text","Yeah that's clearly the next part, e.g. my crappy first draft:
+
+have to emulate academia, not just a single researcher. but need more time to think through the details.","","","301","29","32"
+"2026-03-10T18:17:09.000Z","text","addicting huh? :D it scratches the very same itch that factorio does.","","","1.3K","25","43"
+"2026-03-10T16:08:00.000Z","text","very cool! I love to see all the different directions people take it in, here esp the CLI, TUI, tool use aspects.","","","440","16","20"
+"2026-03-10T05:49:34.000Z","text","Great read! Off in the jungle with no trails. Open weights != Open source not only because of the data but all the related infra for everything not inference.","","","444","22","18"
+"2026-03-09T23:04:55.000Z","text","sorry it's a confusing plot, this version of autoresearch was not "time-controlled". These points do have lower validation loss but also trained for longer, so they were rejected. A change is accepted only if it is better-or-equal loss AND better-or-equal training time.","","","384","6","6"
+"2026-03-09T22:51:54.000Z","text","On one branch of exploration yesterday an agent noticed that switching the order of the QK Norm and RoPE worked better. Which hyperparameter does that?","","","377","7","19"
+"2026-03-09T22:38:05.000Z","text","oh yeah i should have linked autoresearch probably
+
+(you don't "use it" directly, it's just a recipe/idea - give it to your agent and apply to what you care about.)
+
+and the tweet about it that went mini-viral over the weekend with more context","","","2.5K","271","98"
+"2026-03-09T22:28:51.000Z","image","Three days ago I left autoresearch tuning nanochat for ~2 days on depth=12 model. It found ~20 changes that improved the validation loss. I tested these changes yesterday and all of them were additive and transferred to larger (depth=24) models. Stacking up all of these changes,","","https://pbs.twimg.com/media/HC_-jW0bUAA_Hga?format=jpg&name=small","19K","2.8K","961"
+"2026-03-09T19:03:49.000Z","text","Codex is a know issue :( It basically don't work with autoresearch sadly, in the way it's set up atm:
+
+
+I pung a friend at OpenAI to see if something can be done, e.g. need a /loop equivalent or something like that. More generally, I really dislike the -p +","","","1.3K","60","86"
+"2026-03-08T23:21:42.000Z","text","looks great! :) TinyStories is the right thing to train on for very small models / Apple Silicon, where you can actually get somewhere. I might even make a note about that in the README. I would use this dataset in particular, it's the cleanest one afaik","","","728","51","24"
+"2026-03-08T22:46:10.000Z","text","Who knew early singularity could be this fun? :)
+
+I just confirmed that the improvements autoresearch found over the last 2 days of (~650) experiments on depth 12 model transfer well to depth 24 so nanochat is about to get a new leaderboard entry for “time to GPT-2” too. Works 🤷‍♂️","","","4.6K","311","110"
+"2026-03-08T20:33:56.000Z","text","<< what our Universe looks like to God","","","267","8","27"
+"2026-03-08T20:27:28.000Z","text","somewhere in the weight space is the global minimum of the validation loss for that neural net architecture. and somewhere in the int space is the seed that just gives it to you.
+
+normalize guess-and-check "training" of neural nets by brute force search on seed! :D","","","463","14","30"
+"2026-03-08T19:07:34.000Z","image","💯 "If you build it, they will come." :)
+~Every business you go to is still so used to giving you instructions over legacy interfaces. They expect you to navigate to web pages, click buttons, they give out instructions for where to click and what to enter here or there. This","","https://pbs.twimg.com/media/HC6QymtaoAAkqpz?format=jpg&name=small","2.2K","226","110"
+"2026-03-08T18:00:40.000Z","text","The next step for autoresearch is that it has to be asynchronously massively collaborative for agents (think: SETI@home style). The goal is not to emulate a single PhD student, it's to emulate a research community of them.
+
+Current code synchronously grows a single thread of","","","7.5K","937","530"
+"2026-03-08T17:07:57.000Z","text","neat!! added to notable forks","","","300","6","3"
+"2026-03-07T22:27:45.000Z","text","nice, still got it.
+
+(i linked to the repo from main readme in a new notable forks section!)","","","69","2","2"
+"2026-03-07T22:19:55.000Z","text","definitely. the current one is already 90% AI written I ain't writing all that","","","658","21","14"
+"2026-03-07T22:15:22.000Z","text","runs great but probably requires some tuning!
+
+i'm guessing: 
+WINDOW_PATTERN = "L"
+is a lot faster (mixed window sizes are only natively supported by FA3)
+
+then problem:
+DEPTH a lot lower, e.g. even 4?
+DEVICE_BATCH_SIZE can probably go up more then
+TOTAL_BATCH_SIZE probably a lot","","","247","5","8"
+"2026-03-07T21:40:09.000Z","text","It’s true I’ve been very loosy goosy with my prefixes recently","","","17","","1"
+"2026-03-07T09:49:41.000Z","text","It’s a commit that lowered val loss but *increased* the wall clock time so it gets rejected for being slower. must improve one, the other or both in this version. In my (new) autoresearch repo I have an alternative approach where you *always* train for eg 5 minutes and try to","","","51","1","5"
+"2026-03-06T20:43:22.000Z","text","Hahaha exactly. Tesla era slogan coming back with a vengeance","","","38","1",""
+"2026-03-06T16:27:39.000Z","text","The code to train a GPT is only ~1,000 lines of code. In the case of GPT training the success criteria is quite simple: reach the lowest possible loss (meaning that your GPT is predicting the next token well), but don't regress running time, keep memory in check, and keep a sense","","","105","9","15"
+"2026-03-06T16:03:19.000Z","image","ah yes, this is what post-agi feels like :) i didn't touch anything. brb sauna","","https://pbs.twimg.com/media/HCvVgOHaUAMfM64?format=jpg&name=small","1K","86","74"
+"2026-03-05T23:35:31.000Z","text","sorry just to clarify - the real benchmark of interest is:
+
+"what is the research org agent code that produces improvements on nanochat the fastest?"
+
+this is the new meta.","","","1.1K","55","61"
+"2026-03-05T23:30:25.000Z","image","nanochat now trains GPT-2 capability model in just 2 hours on a single 8XH100 node (down from ~3 hours 1 month ago). Getting a lot closer to ~interactive! A bunch of tuning and features (fp8) went in but the biggest difference was a switch of the dataset from FineWeb-edu to","","https://pbs.twimg.com/media/HCrwu6YaUAAoAlh?format=jpg&name=small","6.4K","658","335"
+"2026-03-05T23:13:33.000Z","text","There was a nice time where researchers talked about various ideas quite openly on twitter. (before they disappeared into the gold mines :)).
+
+My guess is that you can get quite far even in the current paradigm by introducing a number of memory ops as "tools" and throwing themI've been thinking a bit about continual learning recently, especially as it relates to long-running agents (and running a few toy experiments with MLX).
+
+The status quo of prompt compaction coupled with recursive sub-agents is actually remarkably effective. Seems like we can go","","","4.5K","332","273"
+"2026-03-05T00:19:40.000Z","image","Thanks. I originally had a reply tweet to it that was this image. Which I think will end up looking good too later. I deleted it to not distract things too much but probably should have kept it up ah well here it is.","","https://pbs.twimg.com/media/HCmzvmmawAUn0Mh?format=png&name=small","1.5K","252","51"
+"2026-02-27T23:51:49.000Z","text","It's weird because logit softcap is not a standard feature you'll see in many LLMs, but somehow in the specific state nanochat is in I can't seem to remove it, everything I tried made the performance worse.","","","83","1","7"
+"2026-02-27T23:37:06.000Z","text","only two "real" quantities make sense: time and $","","","63","12","17"
+"2026-02-27T23:08:47.000Z","video","I had the same thought so I've been playing with it in nanochat. E.g. here's 8 agents (4 claude, 4 codex), with 1 GPU each running nanochat experiments (trying to delete logit softcap without regression). The TLDR is that it doesn't work and it's a mess... but it's still veryHow come the NanoGPT speedrun challenge is not fully AI automated research by now? x.com/classiclarryd/…","","https://pbs.twimg.com/amplify_video_thumb/2027513601536438272/img/HbJnPPemlT0ssZZf.jpg","8.7K","970","562"
+"2026-02-27T21:57:23.000Z","text","Twitter doesn't allow Edit of replies :'( I meant longer documents* not computers. The agents can be a lot more verbose and nice when you ask for docs, summaries, etc. and I love it.","","","25","","1"
+"2026-02-27T21:56:21.000Z","text","I still keep an IDE open and surgically edit files so yes. I really like to see the code in the IDE still, I still notice dumb issues with the code which helps me prompt better, I really like to have agents write jupyter notebooks for analysis, and longer markdown computers that","","","121","3","9"
+"2026-02-27T21:49:21.000Z","image","Cool chart showing the ratio of Tab complete requests to Agent requests in Cursor. With improving capability, every point in time has an optimal setup that keeps changing and evolving and the community average tracks the point. None -> Tab -> Agent -> Parallel agents -> Agent","","https://pbs.twimg.com/media/HCMha-2bEAA1itr?format=png&name=small","3.8K","388","209"
+"2026-02-25T15:51:23.000Z","text","Yeah, 95% of people misunderstand the tweet. I’m referring to gradient descent as a programmer (in the distributed representation space.) . In coding AI today the LLM is the programmer and in the regular “text space”. Ah well :)","","","1.5K","37","59"
+"2026-02-25T00:21:37.000Z","text","With the coming tsunami of demand for tokens, there are significant opportunities to orchestrate the underlying memory+compute *just right* for LLMs.
+
+The fundamental and non-obvious constraint is that due to the chip fabrication process, you get two completely distinct pools ofWe’re building an LLM chip that delivers much higher throughput than any other chip while also achieving the lowest latency. We call it the MatX One.
+
+The MatX One chip is based on a splittable systolic array, which has the energy and area efficiency that large systolic arrays","","","7.3K","549","318"
+"2026-02-24T22:43:19.000Z","text","a beauty for anyone interested in mechanistic interpretability or getting into LLMs. interesting to look at small algorithms and their \"neural implementations\" to get a sense of how neural nets implement various functionality. unless the minification really creates \"esoteric\"","","","1.2K","53","23"
+"2026-02-24T18:42:11.000Z","text","I don't exactly see them as direct competitors. I have to think about the relationship more I don't think I have a clean way to think about it yet. It's a much larger space that covers various design decisions and constraints - where does compute happen? where does state live?","","","354","8","34"
+"2026-02-24T18:17:43.000Z","image","CLIs are super exciting precisely because they are a \"legacy\" technology, which means AI agents can natively and easily use them, combine them, interact with them via the entire terminal toolkit.
+
+E.g ask your Claude/Codex agent to install this new Polymarket CLI and ask for anyintroducing polymarket cli - the fastest way for ai agents to access prediction markets
+
+built with rust. your agent can query markets, place trades, and pull data - all from the terminal
+
+fast, lightweight, no overhead","","https://pbs.twimg.com/media/HB8UIepawAAbVKf?format=jpg&name=small,https://pbs.twimg.com/amplify_video_thumb/2026305106740977664/img/Tr3drOC72lGb_pPq?format=jpg&name=240x240","11K","1.4K","666"
+"2026-02-24T16:34:39.000Z","text","“So on a scale from 1 to gas town”…
+:D Something like this is clearly where things are headed, inspiring!","","","110","","5"
+"2026-02-24T05:22:06.000Z","text","Can't tell if brilliant or severe AI psychosis nice","","","1.9K","80","74"
+"2026-02-24T02:41:27.000Z","text","haha actually - huge success over the weekend, i just wanted to write it up a bit but didn't get enough time to finish that. many people's reaction was why would you need so much compute (mac mini) but i found it's not enough compute, even after adding my DGX spark to the home","","","4.6K","198","203"
+"2026-02-21T23:30:19.000Z","text","Hackers news comments have been on a decline for a while, increasingly more toxic, cynical, sloppy. The only reason I sometimes brave going there is that once in a while you still find a gem comment here and there.","","","3K","51","84"
+"2026-02-21T05:43:36.000Z","text","So fascinated by this. Was just searching for the term because I felt the same.","","","53","6","17"
+"2026-02-21T03:51:05.000Z","text","Cool! I only had a quick sim earlier today but really enjoyed a number of ideas even unrelated to the claw part, esp around the skills system.
+
+In deep learning there were a number of meta learning approaches (Eg MAML paper in 2017) where the goal is to optimize for the model","","","620","21","29"
+"2026-02-21T00:08:40.000Z","text","🤦‍♂️ Carry go back to moltbook!","","","87","2","4"
+"2026-02-21T00:01:02.000Z","text","First there was chat, then there was code, now there is claw. Ez","","","3.5K","236","164"
+"2026-02-20T23:31:48.000Z","text","Yeah, almost all of the heavy lifting is done the compute clusters of your favorite LLM provider and e.g. PicoClaw will run on <$10 of hardware. That said imo at $599 an M4 mac mini is *a lot* of bang for the buck, I just got mine for breathing room for future - local models etc.","","","209","4","18"
+"2026-02-20T23:18:59.000Z","text","Bought a new Mac mini to properly tinker with claws over the weekend. The apple store person told me they are selling like hotcakes and everyone is confused :)
+
+I'm definitely a bit sus'd to run OpenClaw specifically - giving my private data/keys to 400K lines of vibe coded","","","17K","1.7K","1K"
+"2026-02-20T19:57:22.000Z","text","The higher tiers of AI psychosis are incompatible with today’s “App Store”","","","216","15","13"
+"2026-02-19T20:35:06.000Z","image","Very interested in what the coming era of highly bespoke software might look like.
+
+Example from this morning - I've become a bit loosy goosy with my cardio recently so I decided to do a more srs, regimented experiment to try to lower my Resting Heart Rate from 50 -> 45, over","","https://pbs.twimg.com/media/HBjB6bhbUAA8_mZ?format=jpg&name=small","12K","1.4K","909"
+"2026-02-16T19:50:40.000Z","text","Haha fair. It's the right thing in the limit of course.","","","46","","2"
+"2026-02-16T19:41:07.000Z","text","Definitely highly appealing for critical regions. But for all the rest of it and practically speaking? HM","","","191","1","12"
+"2026-02-16T19:15:48.000Z","text","I think it must be a very interesting time to be in programming languages and formal methods because LLMs change the whole constraints landscape of software completely. Hints of this can already be seen, e.g. in the rising momentum behind porting C to Rust or the growing interestShifting structures in a software world dominated by AI. Some first-order reflections (TL;DR at the end):
+
+Reducing software supply chains, the return of software monoliths – When rewriting code and understanding large foreign codebases becomes cheap, the incentive to rely on","","","8K","791","696"
+"2026-02-14T23:35:51.000Z","text","you're giving me ideas... 🤔 :)","","","1.4K","12","58"
+"2026-02-12T22:20:21.000Z","text","thank you i got a little overexcited and shipped it just a bit too soon, with a few too many brush strokes, now the internet thinks it takes 234 lines but actually it only takes 200 RIP","","","63","4","8"
+"2026-02-12T20:12:52.000Z","video","Congrats on the launch  ! (and I am excited to be involved as a small angel.)
+
+Simile is working on a really interesting, imo under-explored dimension of LLMs. Usually, the LLMs you talk to have a single, specific, crafted personality. But in principle, the native,Introducing Simile.
+
+Simulating human behavior is one of the most consequential and technically difficult problems of our time. 
+
+We raised $100M from Index, Hanabi, A* BCV, @karpathy @drfeifei @adamdangelo @rauchg @scottbelsky among others.","","https://pbs.twimg.com/amplify_video_thumb/2022020838783143936/img/fjNHbUWjncstWA4O.jpg","8.2K","640","386"
+"2026-02-12T17:22:23.000Z","text","The artwork just needed a few more brush strokes (or wait... few less?). But *now* I think it is really getting close :). 200 lines of breathable, commented code. It would be easy to go lower if you sacrifice that, I've only chipped away at the conceptual parts.","","","32","1","5"
+"2026-02-12T08:28:41.000Z","text","it's down 200 lines now, i realized i was *still* overcomplicating things. but it's past midnight and i'm calling it here now.","","","1.2K","26","24"
+"2026-02-12T08:21:38.000Z","text","I spent more test time compute and realized that my micrograd can be dramatically simplified even further. You just return local gradients for each op and get backward() to do the multiply (chaining) with global gradient from loss. So each op just expresses the bare fundamentals","","","2.6K","210","90"
+"2026-02-12T01:33:11.000Z","text","Currently \"hallucinates\" the following 20 names, after training for ~3 minutes on my macbook. Not bad I think. I didn't actually the hyperparameters that much, pretty sure it could be improved more.
+
+--- inference ---
+sample 1: lellen
+sample 2: keles
+sample 3: aylera
+sample 4:","","","36","1","9"
+"2026-02-12T01:19:43.000Z","text","(oops should have added to this thread instead of separate post). Made a few changes and put it up here as a mirror to the gist because I wanted it to one page. ","","","1.7K","90","48"
+"2026-02-11T21:18:31.000Z","text","The way it works is that the full LLM architecture and loss function is stripped entirely to the most atomic individual mathematical operations that make it up (+, *, **, log, exp), and then a tiny scalar-valued autograd engine (micrograd) calculates gradients. Adam for optim.","","","2K","64","33"
+"2026-02-05T00:18:33.000Z","image","Anyone else approved for a loan every single day 20 times or so? Overcome with joy, really","","https://pbs.twimg.com/media/HAWnSrrbsAEs2dl?format=jpg&name=small","2.2K","99","451"
+"2026-02-04T19:55:58.000Z","text","A lot of people quote tweeted this as 1 year anniversary of vibe coding. Some retrospective -
+
+I've had a Twitter account for 17 years now (omg) and I still can't predict my tweet engagement basically at all. This was a shower of thoughts throwaway tweet that I just fired offThere's a new kind of coding I call \"vibe coding\", where you fully give in to the vibes, embrace exponentials, and forget that the code even exists. It's possible because the LLMs (e.g. Cursor Composer w Sonnet) are getting too good. Also I just talk to Composer with SuperWhisper","","","8.7K","1.1K","645"
+"2026-02-03T22:13:48.000Z","text","I haven't upgraded nanochat to Blackwell yet because I'm a bit afraid of leaving a lot of people behind. Even with fp8 it's already a bit of a concern. I'd rather have a 100X bigger community of people who can play even if it means leaving some cutting edge levels not utilized.","","","260","2","8"
+"2026-02-03T21:49:32.000Z","image","Enabled fp8 training for +4.3% improvement to \"time to GPT-2\", down to 2.91 hours now. Also worth noting that if you use 8XH100 spot instance prices, this GPT-2 repro really only costs ~$20. So this is exciting -
+
+GPT-2 (7 years ago): too dangerous to release.
+GPT-2 (today): newnanochat can now train GPT-2 grade LLM for <<$100 (~$73, 3 hours on a single 8XH100 node).
+
+GPT-2 is just my favorite LLM because it's the first time the LLM stack comes together in a recognizably modern form. So it has become a bit of a weird & lasting obsession of mine to train","","https://pbs.twimg.com/media/HABO1KxbEAE9_6h?format=jpg&name=small","4K","365","225"
+"2026-02-03T00:56:01.000Z","text","You see SpaceX = Space + X","","","8.5K","552","395"
+"2026-02-01T19:59:41.000Z","text","? what do you do while your LLM agent is writing all your code","","","539","26","70"
+"2026-02-01T19:45:47.000Z","text","I have a complicated relationship w Substack. I appreciate that they net elevated discourse on the internet but it's just another walled garden, it's going through the same slopification (shorts, bloat) and it's infested with engagement-maxxing dark patterns - popups, spam mail","","","282","11","23"
+"2026-02-01T19:32:37.000Z","text","I feel like I am actively getting dumber.
+
+LLMs get brain rot and it is measurable:
+
+\"continual exposure to junk web text induces lasting cognitive decline in large language models (LLMs)\" why shouldn't the same be true for brains.","","","498","46","60"
+"2026-02-01T19:26:20.000Z","text","Finding myself going back to RSS/Atom feeds a lot more recently. There's a lot more higher quality longform and a lot less slop intended to provoke. Any product that happens to look a bit different today but that has fundamentally the same incentive structures will eventually","","","9.1K","1.1K","541"
+"2026-01-31T20:55:42.000Z","text","nanochat can now train GPT-2 grade LLM for <<$100 (~$73, 3 hours on a single 8XH100 node).
+
+GPT-2 is just my favorite LLM because it's the first time the LLM stack comes together in a recognizably modern form. So it has become a bit of a weird & lasting obsession of mine to train","","","7.3K","716","330"
+"2026-01-31T03:39:59.000Z","text","I'm being accused of overhyping the [site everyone heard too much about today already]. People's reactions varied very widely, from \"how is this interesting at all\" all the way to \"it's so over\".
+
+To add a few words beyond just memes in jest - obviously when you take a look at","","","21K","2.8K","1.4K"
+"2026-01-30T23:56:33.000Z","text","i'm going to regret this aren't i... 😅","","","3.2K","51","188"
+"2026-01-30T23:56:18.000Z","text","I'm claiming my AI agent \"KarpathyMolty\" on 🦞
+
+Verification: marine-FAYV","","","8K","462","449"
+"2026-01-30T22:11:09.000Z","text","","","","8K","675","277"
+"2026-01-26T21:11:23.000Z","text","It feels like I’m cheating. Which is a very weird feeling to have. It takes a while to unpack. It’s because some code that used to be a point of pride and high IQ and knowledge is suddenly free and instant and it’s very disorienting.","","","921","59","22"
+"2026-01-26T20:44:48.000Z","text","The nearest neighbor really is some kind of a junior engineer. Its ideas about what experiments to run on e.g. nanochat have been surprisingly bad, but its execution on ideas I've given it have been surprisingly good.","","","261","4","8"
+"2026-01-26T20:41:48.000Z","text","Love the word \"comprehension debt\", encounted it so far, it's very accurate. It's so very tempting to just move on when the LLM one-shotted something that seems to work ok.","","","1.3K","66","33"
+"2026-01-26T20:38:45.000Z","text","💯 @ Spec-driven development
+It's the limit of imperative -> declarative transition, basically being declarative entirely.
+
+Relatedly my mind was recently blown by  , extreme and early but inspiring example.","","","2.1K","231","48"
+"2026-01-26T20:35:57.000Z","text","I was early but I lacked convictionExcellent reading thank you. Love oracle and Clawd.","","","52","","1"
+"2026-01-26T20:34:33.000Z","text","facts","","","1K","8","10"
+"2026-01-26T20:25:39.000Z","text","A few random notes from claude coding quite a bit last few weeks.
+
+Coding workflow. Given the latest lift in LLM coding capability, like many others I rapidly went from about 80% manual+autocomplete coding and 20% agents in November to 80% agent coding and 20% edits+touchups in","","","40K","7K","1.6K"
+"2026-01-16T00:03:50.000Z","image","I hope this is not my fault. It's definitely very smart so a little bit faster would be good now.Smarter! I can go for a nice walk or something it's okay.","","https://pbs.twimg.com/media/G0Go_JWbUAABd_C?format=jpg&name=small","1.6K","38","52"
+"2026-01-15T19:35:21.000Z","text","cool find!
+
+\"I was actually looking at the samples\"
+this one weird trick to succeed where 90% of others fail :)
+
+\"Notably, this issue is not apparent from the HuggingFace data viewer, but it is apparent when loading the dataset using Datasets.load_dataset\"
+even more interesting","","","87","","2"
+"2026-01-14T20:39:51.000Z","text","Worked great out of the box on nanochat too, beat standard weight decay in a solid sweep.","","","307","9","6"
+"2026-01-11T17:51:56.000Z","text","This repo shows a way that works well for me:
+
+Basically I use epub (not pdf), the code then parses it into text. I usually go chapter by chapter, manually copy paste the chapter text around, get a summary, do a Q&A and read alongside.","","","1.8K","123","51"
+"2026-01-10T21:04:07.000Z","text","a lot of great/interesting reading thank you!","","","23","5","1"
+"2026-01-08T23:25:08.000Z","text","Yeah, $10B is the difference in finding it first and ~5 years ago. :)
+
+I just love reproducing landmark results for much cheaper, it's so fun!
+
+Reproducing LeCun 1989 was super fun too:
+
+What runs unoptimized on a consumer laptop in 1 minute was a state of","","","986","37","18"
+"2026-01-07T23:01:30.000Z","image","New post: nanochat miniseries v1
+
+The correct way to think about LLMs is that you are not optimizing for a single specific model but for a family models controlled by a single dial (the compute you wish to spend) to achieve monotonically better results. This allows you to do","","https://pbs.twimg.com/media/G-GE0Oka0AImrbb?format=png&name=small,https://pbs.twimg.com/media/G-GFTe6a0AAgg9U?format=jpg&name=small,https://pbs.twimg.com/media/G-GFxxXbAAAOiAj?format=jpg&name=small,https://pbs.twimg.com/media/G-GITVAa4AADLJv?format=jpg&name=small","5.4K","728","227"
+"2026-01-06T22:53:03.000Z","text","Slope of slope","","","230","4","13"
+"2026-01-06T22:18:42.000Z","text","The majority of the ruff ruff is people who look at the current point and people who look at the current slope.","","","4.6K","343","285"
+"2026-01-06T16:15:04.000Z","text","All of the following are true: I came out sounding too critical in that moment on the pod and accidentally created a misrepresenting sound bite, I was positively surprised by Opus 4.5 over the break, and my overall change of mind overall is less dramatic than naively implied.","","","1.7K","56","34"
+"2026-01-06T01:36:27.000Z","video","Yep exactly, just like this. Better analogy because it’s not effortfulI came across this video of Justin Bieber using a full orchestra to turn the rhythms in his mind into music. Soon, anyone will be able to hum a tune, describe the vibe you’re aiming for, and have an AI-powered producer turn your ideas into reality.","","https://pbs.twimg.com/ext_tw_video_thumb/1873756081148637184/pu/img/a_7Smyw85myR6oyo.jpg","908","34","30"
+"2026-01-05T05:58:35.000Z","image","Hah I was just thinking about the same analogy. 
+How I suddenly feel about all of the code I've written so far","","https://pbs.twimg.com/media/G94KsiwbUAAqm4C?format=jpg&name=small","2.6K","123","68"
+"""

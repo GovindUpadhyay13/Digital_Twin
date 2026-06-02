@@ -1,0 +1,47 @@
+twitter:
+  huggingface_dataset: "dleemiller/karpathy_tweets"
+  mock_tweets:
+    - text: "Developing nanoGPT was a very clean exercise. Back to first principles: just self-attention, projection, residual connections. Beautiful."
+      created_at: "2023-03-10"
+      likes: 4200
+      retweets: 1200
+    - text: "Tesla Autopilot is essentially a large scale vision system. Processing raw pixels directly to control vectors. Dojo is looking very promising."
+      created_at: "2021-06-15"
+      likes: 8500
+      retweets: 2100
+    - text: "CS231n is now live. We put a lot of emphasis on backpropagation, making sure students build intuition for how gradients flow."
+      created_at: "2015-04-10"
+      likes: 3100
+      retweets: 750
+
+blog:
+  github_io_url: "https://karpathy.github.io"
+  medium_url: "https://medium.com/@karpathy"
+  mock_posts:
+    - title: "The Unreasonable Effectiveness of RNNs"
+      url: "https://karpathy.github.io/2015/05/21/rnn-effectiveness/"
+      date: "2015-05-21"
+      content: "There's something magical about Recurrent Neural Networks. I still remember when I first trained a character-level model on Shakespeare and saw it generate text that looked like English. It is a very rich model class."
+    - title: "A Recipe for Training Neural Networks"
+      url: "https://karpathy.github.io/2019/04/25/recipe/"
+      date: "2019-04-25"
+      content: "Training neural nets is a leaky abstraction. You can't just throw code at a framework and expect it to work. You have to start small: visualize the inputs, check the initial loss, overfit a single batch, and only then scale up."
+
+papers:
+  query: 'au:"Andrej Karpathy"'
+  mock_papers:
+    - title: "Deep Visual-Semantic Alignments for Generating Image Descriptions"
+      arxiv_id: "1412.2306"
+      date: "2014-12-08"
+      abstract: "We present a model that generates natural language descriptions of images. It uses a Convolutional Neural Network over image regions and a Recurrent Neural Network to generate the text sentence."
+
+github:
+  owner: "karpathy"
+  repos:
+    - "nanoGPT"
+    - "micrograd"
+    - "char-rnn"
+    - "convnetjs"
+    - "arxiv-sanity-preserver"
+    - "llm.c"
+    - "nn-zero-to-hero"

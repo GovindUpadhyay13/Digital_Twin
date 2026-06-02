@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrej Karpathy Digital Twin</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        kbg: '#0D1117',
+                        ksurface: '#161B22',
+                        kelevated: '#21262D',
+                        kborder: '#30363D',
+                        kprimary: '#58A6FF',
+                        ksecondary: '#F78166',
+                        ksuccess: '#3FB950',
+                        ktext: '#E6EDF3',
+                        ktextmuted: '#8B949E',
+                        kcodebg: '#1F2428',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <!-- Marked & DOMPurify -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+
+    <style>
+        body { background-color: #0D1117; color: #E6EDF3; }
+        .glass { background: rgba(22, 27, 34, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Markdown Styles */
+        .prose pre { background-color: #1F2428; border: 1px solid #30363D; border-radius: 0.5rem; padding: 1rem; margin-top: 0.5rem; margin-bottom: 0.5rem; overflow-x: auto; }
+        .prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+        .prose p code { background-color: rgba(110,118,129,0.4); padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
+        .prose p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .prose a { color: #58A6FF; text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; }
+        .prose ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; }
+
+        /* Animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out; fill: #8B949E; }
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+        /* Custom Accordion */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-content.open { max-height: 500px; overflow-y: auto; }
+        
+        .source-card { transition: transform 0.2s; }
+        .source-card:hover { transform: translateY(-2px); }
+
+        .btn-focus:focus-visible { outline: 2px solid #58A6FF; outline-offset: 2px; }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden font-sans">
+    
+    <!-- Sidebar -->
+    <aside class="w-72 border-r border-kborder bg-ksurface flex flex-col shrink-0 transition-transform duration-300 z-20 absolute md:relative h-full -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="p-6 flex flex-col items-center border-b border-kborder">
+            <div class="relative mb-4">
+                <div class="absolute inset-0 bg-kprimary rounded-full blur-md opacity-30"></div>
+                <img src="https://avatars.githubusercontent.com/u/241138?v=4" alt="Karpathy" class="w-24 h-24 rounded-full relative z-10 border-2 border-kborder">
+                <div class="absolute bottom-0 right-2 w-4 h-4 bg-ksuccess border-2 border-ksurface rounded-full z-20"></div>
+            </div>
+            <h1 class="font-semibold text-xl tracking-tight">Andrej Karpathy</h1>
+            <p class="text-xs text-ktextmuted text-center mt-1">Digital Twin · Powered by LangGraph + Gemini</p>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+            <button onclick="switchTab('chat')" id="tab-chat" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-kprimary bg-kelevated font-medium text-sm transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <span>Chat</span>
+            </button>
+            <button onclick="switchTab('sources')" id="tab-sources" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-ktextmuted hover:text-ktext hover:bg-kelevated/50 font-medium text-sm transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <span>Sources Explorer</span>
+            </button>
+            <button onclick="switchTab('settings')" id="tab-settings" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-ktextmuted hover:text-ktext hover:bg-kelevated/50 font-medium text-sm transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+        
+        <div class="p-4 border-t border-kborder">
+            <button onclick="newSession()" class="btn-focus w-full py-2 bg-kborder hover:bg-kelevated text-sm rounded-lg transition-colors flex justify-center items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                New Conversation
+            </button>
+            <p class="text-[10px] text-ktextmuted text-center mt-3">Built with ❤️ for ML enthusiasts</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col relative h-full">
+        <!-- Header -->
+        <header class="h-16 flex items-center justify-between px-6 border-b border-kborder glass z-10 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-ktextmuted hover:text-white" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div>
+                    <h2 class="font-semibold text-sm">Conversation with Andrej</h2>
+                    <p class="text-xs text-ktextmuted hidden sm:block">Ask about neural nets, LLMs, autonomous driving, or his lectures.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono text-ktextmuted">
+                <span class="px-2 py-1 rounded bg-kelevated border border-kborder">Conversational</span>
+            </div>
+        </header>
+
+        <!-- Views Container -->
+        <div class="flex-1 overflow-hidden relative">
+            
+            <!-- Chat View -->
+            <div id="view-chat" class="absolute inset-0 flex flex-col h-full">
+                <!-- Messages Area -->
+                <div id="chat-container" class="flex-1 overflow-y-auto p-4 sm:p-6 pb-32 space-y-6 hide-scroll">
+                    <!-- Welcome / Empty State will be injected here -->
+                </div>
+
+                <!-- Input Area (Sticky Bottom) -->
+                <div class="absolute bottom-0 w-full p-4 pointer-events-none">
+                    <div class="max-w-3xl mx-auto w-full pointer-events-auto">
+                        <div class="glass border border-kborder rounded-xl p-3 flex flex-col shadow-lg shadow-black/50">
+                            <textarea id="chat-input" rows="1" class="w-full bg-transparent border-none focus:ring-0 resize-none text-sm p-1 max-h-32 hide-scroll" placeholder="Ask Andrej anything..." oninput="autoResizeTextarea(this)" onkeydown="handleKeydown(event)"></textarea>
+                            <div class="flex justify-between items-center mt-2 pl-1">
+                                <span class="text-[10px] text-ktextmuted font-mono">⏎ Send · ⇧⏎ Newline · Gemini 2.5 Flash</span>
+                                <button id="send-btn" onclick="handleSend()" class="btn-focus bg-kprimary text-black rounded-full p-1.5 hover:bg-blue-400 transition-colors disabled:opacity-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sources Explorer View -->
+            <div id="view-sources" class="absolute inset-0 h-full hidden overflow-y-auto p-6 hide-scroll">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-2">Sources Explorer</h2>
+                    <p class="text-sm text-ktextmuted mb-6">Aggregated view of every unique source cited in this session.</p>
+                    <div id="all-sources-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Sources injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="view-settings" class="absolute inset-0 h-full hidden overflow-y-auto p-6 hide-scroll">
+                <div class="max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6">Settings</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-ksurface border border-kborder rounded-lg p-5">
+                            <h3 class="font-semibold mb-2">Session Management</h3>
+                            <p class="text-sm text-ktextmuted mb-4">Your current Session ID: <code id="display-session-id" class="bg-kcodebg px-1 py-0.5 rounded text-kprimary select-all"></code></p>
+                            <button onclick="clearSession()" class="px-4 py-2 bg-red-900/50 text-red-200 border border-red-800 rounded-lg text-sm hover:bg-red-900 transition-colors">Clear Session Memory</button>
+                        </div>
+                        
+                        <div class="bg-ksurface border border-kborder rounded-lg p-5">
+                            <h3 class="font-semibold mb-2">Appearance</h3>
+                            <p class="text-sm text-ktextmuted mb-4">Toggle light/dark mode (Dark mode strictly recommended for hacker vibe).</p>
+                            <button onclick="toggleTheme()" class="px-4 py-2 bg-kelevated border border-kborder rounded-lg text-sm hover:bg-kborder transition-colors">Toggle Theme</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            sessionId: localStorage.getItem('karpathy_session_id'),
+            messages: [],
+            isLoading: false,
+            activeTab: 'chat',
+            allSources: []
+        };
+
+        // DOM Elements
+        const elChatContainer = document.getElementById('chat-container');
+        const elChatInput = document.getElementById('chat-input');
+        const elSendBtn = document.getElementById('send-btn');
+        const elSidebar = document.getElementById('sidebar');
+
+        // Init App
+        async function initApp() {
+            if (!state.sessionId) {
+                await newSession(false);
+            }
+            document.getElementById('display-session-id').innerText = state.sessionId;
+            
+            // Show welcome message
+            appendMessage('bot', "Hey! I'm Andrej's digital twin. I've been trained on his lectures, blog posts, tweets, and papers. Ask me anything — from backprop fundamentals to the future of LLMs.", null, false);
+            showSuggestedPrompts();
+        }
+
+        async function newSession(promptClear = true) {
+            if (promptClear && !confirm("Start a new conversation? Current chat will be lost.")) return;
+            try {
+                const res = await fetch('/api/session/new', { method: 'POST' });
+                const data = await res.json();
+                state.sessionId = data.session_id;
+                localStorage.setItem('karpathy_session_id', state.sessionId);
+                state.messages = [];
+                state.allSources = [];
+                elChatContainer.innerHTML = '';
+                initApp();
+            } catch (e) {
+                showToast("Failed to create new session.");
+            }
+        }
+
+        async function clearSession() {
+            if (!confirm("Delete session memory on server?")) return;
+            try {
+                await fetch(`/api/session/${state.sessionId}`, { method: 'DELETE' });
+                await newSession(false);
+                switchTab('chat');
+                showToast("Session cleared successfully.");
+            } catch (e) {
+                showToast("Failed to clear session.");
+            }
+        }
+
+        // --- Chat Logic ---
+        function handleKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        }
+
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        }
+
+        async function handleSend(textOverride = null) {
+            if (state.isLoading) return;
+            
+            const text = textOverride || elChatInput.value.trim();
+            if (!text) return;
+
+            // Clean UI
+            elChatInput.value = '';
+            elChatInput.style.height = 'auto';
+            hideSuggestedPrompts();
+            
+            // User Message
+            appendMessage('user', text);
+            state.isLoading = true;
+            elSendBtn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            
+            const indicatorId = showTypingIndicator();
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: state.sessionId, message: text })
+                });
+                
+                if (!res.ok) throw new Error("API Error");
+                
+                const data = await res.json();
+                hideTypingIndicator(indicatorId);
+                appendMessage('bot', data.response, data.sources);
+                
+                // Track sources
+                if (data.sources) {
+                    data.sources.forEach(s => {
+                        if (!state.allSources.find(x => x.title === s.title)) {
+                            state.allSources.push(s);
+                        }
+                    });
+                    updateSourcesExplorer();
+                }
+
+            } catch (err) {
+                hideTypingIndicator(indicatorId);
+                appendMessage('bot', "⚠️ Sorry, I encountered an error connecting to the backend.");
+                showToast("Chat request failed.");
+            } finally {
+                state.isLoading = false;
+                elSendBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+            }
+        }
+
+        function appendMessage(role, content, sources = null, animate = true) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex w-full ${role === 'user' ? 'justify-end' : 'justify-start'} ${animate ? 'animate-slide-up' : ''}`;
+            
+            const innerHTML = role === 'user' 
+                ? `
+                <div class="max-w-[80%] md:max-w-[70%] bg-ksecondary text-white rounded-2xl rounded-tr-sm px-4 py-2.5 shadow-md">
+                    <p class="text-sm whitespace-pre-wrap">${escapeHTML(content)}</p>
+                </div>
+                `
+                : `
+                <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
+                    <img src="https://avatars.githubusercontent.com/u/241138?v=4" class="w-8 h-8 rounded-full border border-kborder mt-1 shadow-sm shrink-0">
+                    <div class="glass border border-kprimary/20 rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg flex-1 overflow-hidden">
+                        <div class="prose prose-invert max-w-none text-sm">${renderMarkdown(content)}</div>
+                        ${sources && sources.length > 0 ? renderSourcesHTML(sources) : ''}
+                    </div>
+                </div>
+                `;
+            
+            wrapper.innerHTML = innerHTML;
+            elChatContainer.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        // --- Renderers ---
+        function renderMarkdown(text) {
+            // First run marked
+            let html = marked.parse(text);
+            // Purify for safety
+            html = DOMPurify.sanitize(html);
+            // Note: In a real advanced setup, KaTeX parsing happens before/during marked, 
+            // but for simplicity here we assume standard code blocks.
+            setTimeout(() => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }, 10);
+            return html;
+        }
+
+        function renderSourcesHTML(sources) {
+            const id = 'acc-' + Math.random().toString(36).substr(2, 9);
+            const sourceCards = sources.map(s => {
+                let badgeColor = 'bg-gray-600';
+                if(s.type === 'blog') badgeColor = 'bg-blue-600';
+                if(s.type === 'tweet') badgeColor = 'bg-sky-500';
+                if(s.type === 'paper') badgeColor = 'bg-purple-600';
+                
+                const percent = Math.min(100, Math.max(0, s.relevance * 100));
+                
+                return `
+                <div class="source-card bg-kcodebg border border-kborder rounded p-3 flex flex-col gap-2 mt-2">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded text-white ${badgeColor}">${s.type}</span>
+                            <span class="font-mono text-xs text-white truncate max-w-[150px] md:max-w-[250px]" title="${s.title}">${s.title}</span>
+                        </div>
+                        <span class="font-mono text-[10px] text-ktextmuted">${s.year}</span>
+                    </div>
+                    <div class="w-full bg-kborder rounded-full h-1.5 mt-1 overflow-hidden">
+                        <div class="bg-gradient-to-r from-kprimary to-ksecondary h-1.5 rounded-full" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="text-[9px] text-ktextmuted font-mono text-right">Relevance: ${(s.relevance).toFixed(2)}</div>
+                </div>
+                `;
+            }).join('');
+
+            return `
+            <div class="mt-4 border-t border-kborder/50 pt-3">
+                <button onclick="document.getElementById('${id}').classList.toggle('open')" class="flex items-center gap-2 text-xs text-ktextmuted hover:text-kprimary transition-colors font-mono btn-focus rounded px-1 -ml-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                    Sources (${sources.length})
+                </button>
+                <div id="${id}" class="accordion-content">
+                    ${sourceCards}
+                </div>
+            </div>
+            `;
+        }
+
+        function updateSourcesExplorer() {
+            const container = document.getElementById('all-sources-container');
+            container.innerHTML = state.allSources.map(s => {
+                let badgeColor = 'bg-gray-600';
+                if(s.type === 'blog') badgeColor = 'bg-blue-600';
+                if(s.type === 'tweet') badgeColor = 'bg-sky-500';
+                if(s.type === 'paper') badgeColor = 'bg-purple-600';
+                return `
+                <div class="bg-ksurface border border-kborder rounded-lg p-4 hover:border-kprimary/50 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold tracking-wider uppercase px-2 py-1 rounded text-white ${badgeColor}">${s.type}</span>
+                        <span class="font-mono text-xs text-ktextmuted">${s.year}</span>
+                    </div>
+                    <h3 class="font-mono text-sm text-white mb-2">${s.title}</h3>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- UI Helpers ---
+        function showSuggestedPrompts() {
+            const html = `
+            <div id="suggested-prompts" class="flex flex-wrap gap-2 animate-slide-up mt-4">
+                <button onclick="handleSend('Explain backprop like in your micrograd video')" class="px-3 py-1.5 border border-kborder bg-kelevated hover:border-kprimary text-xs rounded-full transition-colors text-ktextmuted hover:text-white">Explain backprop like in your micrograd video</button>
+                <button onclick="handleSend('What is your take on the future of LLMs?')" class="px-3 py-1.5 border border-kborder bg-kelevated hover:border-kprimary text-xs rounded-full transition-colors text-ktextmuted hover:text-white">What's your take on the future of LLMs?</button>
+                <button onclick="handleSend('How would you build GPT-2 from scratch?')" class="px-3 py-1.5 border border-kborder bg-kelevated hover:border-kprimary text-xs rounded-full transition-colors text-ktextmuted hover:text-white">How would you build GPT-2 from scratch?</button>
+            </div>`;
+            elChatContainer.insertAdjacentHTML('beforeend', html);
+        }
+
+        function hideSuggestedPrompts() {
+            const el = document.getElementById('suggested-prompts');
+            if (el) el.remove();
+        }
+
+        function showTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.id = id;
+            wrapper.className = `flex w-full justify-start animate-slide-up`;
+            wrapper.innerHTML = `
+                <div class="flex gap-3 max-w-[90%]">
+                    <img src="https://avatars.githubusercontent.com/u/241138?v=4" class="w-8 h-8 rounded-full border border-kborder mt-1 shadow-sm shrink-0">
+                    <div class="glass border border-kprimary/20 rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg flex items-center h-12">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24">
+                            <circle class="typing-dot" cx="4" cy="12" r="2"></circle>
+                            <circle class="typing-dot" cx="12" cy="12" r="2"></circle>
+                            <circle class="typing-dot" cx="20" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                </div>
+            `;
+            elChatContainer.appendChild(wrapper);
+            scrollToBottom();
+            return id;
+        }
+
+        function hideTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            elChatContainer.scrollTo({ top: elChatContainer.scrollHeight, behavior: 'smooth' });
+        }
+
+        function switchTab(tabId) {
+            ['chat', 'sources', 'settings'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('text-kprimary', 'bg-kelevated');
+                document.getElementById('tab-' + t).classList.add('text-ktextmuted');
+            });
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('text-kprimary', 'bg-kelevated');
+            document.getElementById('tab-' + tabId).classList.remove('text-ktextmuted');
+            
+            if(window.innerWidth < 768) {
+                elSidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        function toggleTheme() {
+            // Placeholder: currently hardcoded to dark for the lab theme.
+            showToast("Light mode is un-hacker-like! (Theme fixed to dark)");
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-kelevated border border-kborder text-white px-4 py-2 rounded shadow-lg z-50 animate-slide-up text-sm font-mono';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Boot
+        initApp();
+    </script>
+</body>
+</html>
