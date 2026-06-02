@@ -32,7 +32,7 @@ The digital twin is accessed through an interactive dark-mode web interface powe
 ![Conversation with Andrej](image1)
 
 **Semantic Memory & Source Retrieval:**
-![Memory Dashboard & Sources](image2)
+![Memory Dashboard & Sources](dashboard/Sources_and_conversations.png)
 
 ---
 
