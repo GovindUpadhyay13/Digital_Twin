@@ -29,7 +29,7 @@ An interactive AI application built with **LangGraph**, **Gemini 2.5 Flash**, an
 The digital twin is accessed through an interactive dark-mode web interface powered by FastAPI and a modern frontend, enabling natural conversation with Andrej's agentic clone.
 
 **Main Conversation Interface:**
-![Conversation with Andrej](dashboard/SYSTEM_ARCHITECHTURE.png)
+![Conversation with Andrej](dashboard/DASHBOARD_PREVIEW.png)
 
 **Semantic Memory & Source Retrieval:**
 ![Memory Dashboard & Sources](dashboard/Sources_and_conversations.png)
