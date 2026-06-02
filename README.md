@@ -51,48 +51,7 @@ This project employs a **multi-source data acquisition pipeline** to build a com
    - **Processing**: HTML is converted to markdown; metadata includes publication date for temporal filtering.
 
 
-### Data Collection Pipeline (`data_collection/`)
 
-The data collection system is modularized into source-specific collectors:
-
-```
-data_collection/
-├── run_all.py              # Main orchestrator: runs all collectors
-├── youtube_collector.py    # Downloads & transcribes YouTube videos
-├── twitter_collector.py    # Scrapes X/Twitter posts and threads
-├── arxiv_collector.py      # Fetches academic papers from arXiv
-├── github_collector.py     # Clones and indexes GitHub repositories
-├── blog_collector.py       # Crawls blog posts and web articles
-└── utils/
-    ├── text_cleaner.py     # Normalizes text, removes noise
-    └── metadata_extractor.py # Extracts timestamps, authors, URLs
-```
-
-**Running Data Collection:**
-
-```bash
-# Collect from all sources
-python data_collection/run_all.py --source all
-
-# Collect from specific source
-python data_collection/run_all.py --source youtube
-python data_collection/run_all.py --source twitter
-python data_collection/run_all.py --source arxiv
-python data_collection/run_all.py --source github
-python data_collection/run_all.py --source blog
-```
-
-Raw data is stored in `data/raw/` organized by source:
-```
-data/
-├── raw/
-│   ├── youtube/          # Transcripts (.json, .txt)
-│   ├── twitter/          # Tweets (.json)
-│   ├── arxiv/            # Papers (.pdf, .txt)
-│   ├── github/           # Code & docs (.py, .md)
-│   └── blog/             # Articles (.html, .md)
-├── processed/            # Cleaned & chunked documents
-└── embeddings/           # Vector embeddings (ChromaDB)
 ```
 
 ### Data Processing & Embedding Pipeline (`scripts/ingest_documents.py`)
