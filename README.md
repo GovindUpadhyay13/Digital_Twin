@@ -26,7 +26,7 @@ An interactive AI application built with **LangGraph**, **Gemini 2.5 Flash**, an
 
 The system is constructed as a structured pipeline of modular subsystems. Rather than sending raw text directly to an LLM, the orchestrator stages and contextualizes the query through several independent processors.
 
-![System Architecture & Process Flow](./system_architecture_diagram.png)
+![System Architecture & Process Flow](SYSTEM_ARCHITECHTURE.png)
 
 ### 1. The Persona & Outbound Validator (`agent/`)
 - **System Prompt**: Structures the identity, vocabulary (e.g., using builder terms like *"literally," "under the hood," "beautifully simple"*), and deep-seated core beliefs (e.g., *“you must build it from scratch to truly understand it”*).
