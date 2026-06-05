@@ -1,3 +1,4 @@
+
 import uuid
 import asyncio
 import logging
@@ -5,9 +6,9 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, AsyncGenerator
 from core.orchestrator import KarpathyTwinOrchestrator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -33,7 +34,7 @@ class ChatRequest(BaseModel):
 
 class Source(BaseModel):
     title: str
-    year: int
+    year: Optional[int] = None
     type: str
     relevance: float
 
@@ -57,14 +58,19 @@ async def chat(request: ChatRequest):
     session_id = request.session_id
     message = request.message
     
-    if session_id not in sessions:
-        logger.info(f"Instantiating new orchestrator for session: {session_id}")
-        try:
+    try:
+        if session_id not in sessions:
+            logger.info(f"Instantiating new orchestrator for session: {session_id}")
             # We initialize it lazily per session_id
             sessions[session_id] = KarpathyTwinOrchestrator(session_id=session_id)
-        except Exception as e:
-            logger.error(f"Failed to create orchestrator: {e}", exc_info=True)
-            raise HTTPException(status_code=500, detail={"error": "Failed to initialize orchestrator."})
+    except Exception as e:
+        logger.error(f"Failed to create orchestrator: {e}", exc_info=True)
+        # Even if orchestrator fails, we return a safe response
+        return ChatResponse(
+            response="Hey! I'm having a little trouble getting started, but let's chat. What do you want to know about neural networks?",
+            sources=[],
+            timestamp=datetime.utcnow().isoformat() + "Z"
+        )
 
     orchestrator = sessions[session_id]
     
@@ -75,11 +81,21 @@ async def chat(request: ChatRequest):
         
         parsed_sources = []
         for s in result.get("sources", []):
+            year_val = None
+            raw_year = s.get("year")
+            if raw_year is not None:
+                if isinstance(raw_year, int):
+                    year_val = raw_year
+                elif isinstance(raw_year, str) and raw_year.strip() != "":
+                    try:
+                        year_val = int(raw_year.strip())
+                    except (ValueError, TypeError):
+                        year_val = None
             parsed_sources.append(Source(
                 title=s.get("title", "Unknown"),
-                year=s.get("year", 2023),
+                year=year_val,
                 type=s.get("source_type", s.get("type", "unknown")),
-                relevance=s.get("relevance", 0.0)
+                relevance=float(s.get("relevance", 0.0))
             ))
             
         return ChatResponse(
@@ -89,13 +105,63 @@ async def chat(request: ChatRequest):
         )
     except Exception as e:
         logger.error(f"Error during chat: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail={"error": "Internal server error during chat processing."})
+        # Return fallback response on any error
+        return ChatResponse(
+            response="Hey! Let's talk about neural networks. What are you curious about?",
+            sources=[],
+            timestamp=datetime.utcnow().isoformat() + "Z"
+        )
+
+# Streaming endpoint (simulated since our LLM call is synchronous for now)
+@app.post("/api/chat/stream")
+async def chat_stream(request: ChatRequest):
+    session_id = request.session_id
+    message = request.message
+    
+    if session_id not in sessions:
+        logger.info(f"Instantiating new orchestrator for session: {session_id}")
+        try:
+            sessions[session_id] = KarpathyTwinOrchestrator(session_id=session_id)
+        except Exception as e:
+            logger.error(f"Failed to create orchestrator: {e}", exc_info=True)
+            async def error_stream():
+                yield "data: Hey! I'm having a little trouble getting started, but let's chat.\n\n"
+            return StreamingResponse(error_stream(), media_type="text/event-stream")
+
+    orchestrator = sessions[session_id]
+    
+    async def generate() -> AsyncGenerator[str, None]:
+        try:
+            # Get full response first
+            result = await asyncio.to_thread(orchestrator.chat, user_message=message)
+            full_response = result.get("response", "")
+            sources = result.get("sources", [])
+            
+            # Simulate streaming by splitting into words and sending chunks
+            words = full_response.split()
+            chunk = ""
+            for i, word in enumerate(words):
+                chunk += word + " "
+                if i % 3 == 0:  # Send every 3 words
+                    yield f"data: {chunk}\n\n"
+                    chunk = ""
+                    await asyncio.sleep(0.05)  # Simulate delay
+            if chunk:
+                yield f"data: {chunk}\n\n"
+                
+            # Send sources as final event
+            yield f"data: __SOURCES__{json.dumps(sources)}\n\n"
+            yield "data: __END__\n\n"
+        except Exception as e:
+            logger.error(f"Error during streaming chat: {e}", exc_info=True)
+            yield f"data: Hey! Let's talk about neural networks.\n\n"
+    
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @app.get("/api/session/{session_id}/history")
 async def get_history(session_id: str):
     # Returns conversation history if available
     # For now, orchestrator abstracts it, but we can return an empty list
-    # or implement extracting memory window later.
     return {"history": []}
 
 @app.delete("/api/session/{session_id}")
@@ -112,10 +178,10 @@ async def delete_session(session_id: str):
 
 # Mount static files to serve the frontend
 import os
+import json
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def serve_index():
     return FileResponse("static/index.html")
-

@@ -70,4 +70,17 @@ phases:
       - "educational"
       - "scratch"
       - "tokenizers"
-    description: "Founded Eureka Labs to build AI-native schools. Published zero-to-hero YouTube lectures and built educational repos like nanoGPT, micrograd, and llm.c from scratch."
+      - "vibe coding"
+      - "claw"
+      - "autoresearch"
+    description: "Founded Eureka Labs to build AI-native schools. Published zero-to-hero YouTube lectures and built educational repos like nanoGPT, micrograd, and llm.c from scratch. Worked on vibe coding, claws, and autoresearch projects."
+
+  - id: "anthropic"
+    title: "Anthropic Researcher"
+    start_year: 2026
+    end_year: 2030
+    keywords:
+      - "anthropic"
+      - "frontier llms"
+      - "research"
+    description: "Joined Anthropic in May 2026 because 'the next few years at the frontier of LLMs will be especially formative'. Still deeply passionate about education and plans to resume that work in time."

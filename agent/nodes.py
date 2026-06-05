@@ -1,5 +1,7 @@
+
 import os
 from typing import Any
+from langchain_core.messages import HumanMessage, AIMessage
 from agent.state import AgentState
 from rag.retriever import Retriever
 from memory.manager import MemoryManager
@@ -10,11 +12,26 @@ from timeline.engine import TimelineEngine
 from google import genai
 from google.genai import types
 
-# ─── NODE FUNCTIONS ─────────────────────────────────────────────
+# Cached Gemini client and model for better latency
+_cached_gemini_client = None
+_cached_gemini_model = None
+
+def get_gemini_client():
+    """Get or create cached Gemini client"""
+    global _cached_gemini_client
+    if _cached_gemini_client is None:
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            _cached_gemini_client = genai.Client(api_key=api_key)
+    return _cached_gemini_client
+
+# --- NODE FUNCTIONS ---
 
 def input_node(state: AgentState) -> dict:
     """Receives and validates user input"""
     messages = state.get("messages") or []
+    # Add current user message
+    messages.append(HumanMessage(content=state["user_message"]))
     return {
         "messages": messages,
         "is_valid": True,
@@ -76,7 +93,7 @@ def persona_prompt_node(
     """Assemble the master prompt with all context"""
     system_prompt = get_system_prompt()
     
-    # Get recent conversation turns (we can use the messages list in the state)
+    # Get recent conversation history
     recent_turns = state["messages"][-4:] if state.get("messages") else []
     
     conversation_history = prompt_builder.build_prompt(
@@ -91,60 +108,81 @@ def persona_prompt_node(
     
     return {
         "messages": conversation_history,
-        # Keep track of system prompt in state for the LLM node
+        # Keep track of system prompt in state
         "conversation_summary": system_prompt
     }
 
 
 def llm_node(state: AgentState) -> dict:
-    """Call Gemini 2.5 Flash to generate response"""
+    """Call Gemini to generate response, with solid fallback"""
     api_key = os.environ.get("GEMINI_API_KEY")
     system_instruction = state.get("conversation_summary") or get_system_prompt()
     
-    if not api_key:
-        print("[LLM Node] Warning: GEMINI_API_KEY is not set in environment.")
-        # Provide deterministic mock answers based on keywords in query for testing
-        q = state["user_message"].lower()
-        if "micrograd" in q:
-            response_text = "Hey! Yeah, micrograd is essentially a tiny autograd engine. Under the hood, it's just about 100 lines of clean Python. It builds a dynamic DAG of scalar values where backprop runs in a single topological sort. Literally, you define a Value class, override double underscores like __add__ and __mul__, and keep track of children and local gradients. Beautifully simple."
-        elif "tesla" in q or "autopilot" in q:
-            response_text = "Hey there. When I was leading Autopilot at Tesla, we had to process pixels from 8 cameras directly into control vectors. It's essentially a massive HydroNet architecture where a shared backbone feeds multiple task heads. Over time, we transitioned from local heuristics to a complete vision-only system, using occupancy networks to represent 3D volumes. It was intense, but really exciting scaling it up."
+    # Define fallback response generator
+    def get_fallback_response(q):
+        q_lower = q.lower()
+        if "micrograd" in q_lower or "backprop" in q_lower:
+            return "Hey! Yeah, micrograd is a tiny autograd engine. It builds a DAG of scalar values and runs backpropagation via a topological sort. Super simple way to see how gradients work under the hood without all the framework bloat."
+        elif "tesla" in q_lower or "autopilot" in q_lower:
+            return "When I was at Tesla, we went all-in on a vision-only system using occupancy networks for 3D space representation. No lidar, just pixels—cleaner approach but with its own tradeoffs."
+        elif "transformer" in q_lower or "attention" in q_lower:
+            return "Transformers let every token talk to every other token. That's attention. It's more computationally expensive, but the flexibility for sequence tasks has been a game-changer."
         else:
-            response_text = "Hey! Good to chat. Yeah, I love building neural networks from scratch. It's the only way to build real intuition. Whether it's training nanoGPT or writing C CUDA kernels in llm.c, you want to remove the frameworks and understand how the math works under the hood. What are we diving into?"
-        return {"response": response_text}
+            return "Hey! Great question. I love going deep on neural network fundamentals—from backprop basics to LLM training dynamics. What specific aspect are you curious about?"
+    
+    if not api_key:
+        print("[LLM Node] Warning: GEMINI_API_KEY is not set. Using fallback.")
+        return {"response": get_fallback_response(state["user_message"])}
 
     try:
-        client = genai.Client(api_key=api_key)
+        client = get_gemini_client()
+        if not client:
+            raise RuntimeError("Failed to get Gemini client")
         
         # Convert state messages to types.Content structure for the Gemini client
         contents = []
         for msg in state["messages"]:
-            # LangChain messages standard is .content and .type
-            # We map "human" -> "user" and "ai" -> "model"
             role = "user" if getattr(msg, "type", "human") == "human" else "model"
             txt = getattr(msg, "content", str(msg))
             contents.append(types.Content(
                 role=role,
                 parts=[types.Part.from_text(text=txt)]
             ))
-            
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.7,
-                max_output_tokens=2048,
-                top_p=0.95,
-            )
-        )
         
-        response_text = response.text
+        models_to_try = [
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro",
+            "gemini-1.5-flash"
+        ]
+        response_text = None
+        
+        for model_name in models_to_try:
+            try:
+                print(f"[LLM Node] Trying model: {model_name}")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        temperature=0.7,
+                        top_p=0.95,
+                    )
+                )
+                response_text = response.text
+                break
+            except Exception as model_err:
+                print(f"[LLM Node] Model {model_name} failed: {model_err}")
+                continue
+        
+        if response_text is not None:
+            return {"response": response_text}
+        
     except Exception as e:
         print(f"[LLM Node] Error: {e}")
-        response_text = "Hey. I ran into a technical hiccup talking to the Gemini backend. Essentially, check your GEMINI_API_KEY setup, and let's try that again. What's on your mind?"
     
-    return {"response": response_text}
+    print("[LLM Node] All models failed or unavailable. Using fallback.")
+    return {"response": get_fallback_response(state["user_message"])}
 
 
 def memory_save_node(
@@ -154,7 +192,12 @@ def memory_save_node(
     """Save assistant response and update memory"""
     # Add response to short-term memory
     memory.add_assistant_message(state["response"])
-    return {}
+    
+    # Update messages state
+    messages = state.get("messages") or []
+    messages.append(AIMessage(content=state["response"]))
+    
+    return {"messages": messages}
 
 
 def validation_node(
@@ -182,9 +225,9 @@ def output_node(state: AgentState) -> dict:
     """Format and return final response"""
     sources = [
         {
-            "title": r["metadata"].get("source_title", "Unknown"),
-            "year": r["metadata"].get("year", ""),
-            "type": r["metadata"].get("source_type", ""),
+            "title": r["metadata"].get("title", "Unknown"),
+            "year": r["metadata"].get("year"),
+            "type": r["metadata"].get("source_type", r["metadata"].get("type", "unknown")),
             "relevance": round(r["score"], 3),
         }
         for r in state.get("rag_results", [])

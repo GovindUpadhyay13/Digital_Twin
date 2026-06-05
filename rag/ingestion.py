@@ -47,10 +47,24 @@ class RAGIngestor:
             print(f"[WARN] Raw data directory '{raw_dir}' does not exist. Please run data collection first.")
             return
             
-        for source_type in ["twitter", "blog", "papers", "github"]:
+        for source_type in ["twitter", "blog", "papers", "github", "biography", "transcripts"]:
             source_dir = raw_dir / source_type
             if source_dir.exists():
                 self._ingest_source(source_type, source_dir)
+            elif source_type == "biography":
+                # Also check root data/raw for any .md or .txt files
+                for file_path in list(raw_dir.glob("*.md")) + list(raw_dir.glob("*.txt")):
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        self._process_document("biography", file_path.name, content)
+                    except Exception as e:
+                        print(f"[ERROR] Failed to ingest {file_path.name}: {e}")
+        
+        # Also check separate transcripts directory in project root
+        transcripts_root_dir = Path("transcripts")
+        if transcripts_root_dir.exists():
+            self._ingest_transcripts_from_root(transcripts_root_dir)
 
     def _process_document(self, source_type: str, doc_name: str, content: str):
         """Helper to preprocess, chunk, embed, and index a document text"""
@@ -150,6 +164,32 @@ class RAGIngestor:
                     self._process_document(source_type, file_path.name, content)
                 except Exception as e:
                     print(f"[ERROR] Failed to ingest text file {file_path.name}: {e}")
+
+    def _ingest_transcripts_from_root(self, transcripts_dir: Path):
+        """Ingest JSON transcript files from project root transcripts directory in user's exact format"""
+        for json_file in transcripts_dir.glob("*.json"):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    transcript_data = json.load(f)
+                
+                # Extract data from user's exact transcript format
+                video_title = transcript_data.get("video_title", "Unknown Transcript")
+                video_id = transcript_data.get("video_id", "")
+                raw_text = transcript_data.get("raw_text", "")
+                timestamp_start = transcript_data.get("timestamp_start", 0)
+                timestamp_end = transcript_data.get("timestamp_end", 0)
+                
+                # Format into document
+                full_text = f"# {video_title}\n\n"
+                full_text += f"Video ID: {video_id}\n"
+                full_text += f"Duration: {timestamp_start} to {timestamp_end} seconds\n\n"
+                full_text += raw_text
+                
+                doc_name = f"transcript_{video_id or json_file.stem}.txt"
+                self._process_document("transcript", doc_name, full_text)
+                
+            except Exception as e:
+                print(f"[ERROR] Failed to ingest transcript {json_file.name}: {e}")
 
 if __name__ == "__main__":
     RAGIngestor().ingest_all()

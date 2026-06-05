@@ -1,0 +1,64 @@
+# Environment variables
+.env
+.env.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Vector DB and storage
+storage/
+chroma_db/
+*.db
+*.sqlite
+
+# Transcripts and temporary data
+transcripts/
+*.jsonl
+*.csv
+data/raw/twitter/
+data/raw/blog/
+data/raw/github/
+data/raw/papers/
+data/scraped_tweets.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Temp scripts
+check_gemini_models.py
+run_pipeline.bat

@@ -17,6 +17,27 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     print(f"[WARN] Config file '{config_path}' not found. Returning empty default settings.")
     return {}
 
+def validate_env() -> None:
+    """Validates required environment variables are set"""
+    required_vars = ["GEMINI_API_KEY"]
+    missing_vars = [var for var in required_vars if not os.environ.get(var)]
+    
+    if missing_vars:
+        print(f"[ERROR] Missing required environment variables: {', '.join(missing_vars)}")
+        print("Please set these in your .env file or environment variables.")
+        print("Creating .env file template...")
+        
+        template_path = Path(__file__).parent.parent / ".env.example"
+        with open(template_path, "w", encoding="utf-8") as f:
+            f.write("# Digital Twin - Environment Variables\n")
+            f.write("# Copy this file to .env and fill in your values\n\n")
+            f.write("GEMINI_API_KEY=your_gemini_api_key_here\n")
+            f.write("# Optional: Add other API keys if needed\n")
+            f.write("# YOUTUBE_API_KEY=your_youtube_api_key\n")
+            f.write("# TWITTER_API_KEY=your_twitter_api_key\n")
+        print(f"Created .env.example at {template_path.resolve()}")
+        print("Please create .env file with your actual API keys.")
+
 def load_env(env_path: str = ".env"):
     """
     Parses a local .env file and sets values in os.environ.
@@ -44,3 +65,6 @@ def load_env(env_path: str = ".env"):
         # Fallback print warning
         if not os.environ.get("GEMINI_API_KEY"):
             print("[WARN] .env file not found and GEMINI_API_KEY environment variable is not set.")
+    
+    # Validate environment variables after loading
+    validate_env()

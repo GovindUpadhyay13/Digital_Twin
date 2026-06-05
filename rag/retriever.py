@@ -1,184 +1,155 @@
+
 import os
-import json
-import numpy as np
+import re
 from typing import Optional, List, Dict
 from pathlib import Path
 from rag.embedder import Embedder
+
 
 class Retriever:
     def __init__(
         self,
         model_name: str = "all-MiniLM-L6-v2",
         persist_dir: str = "storage/chroma_db",
+        top_k: int = 10,
         collection_name: str = "karpathy_knowledge",
-        top_k: int = 5,
         boost_primary: float = 1.3,
+        *args,
+        **kwargs,
     ):
         self.persist_dir = persist_dir
-        self.collection_name = collection_name
         self.top_k = top_k
-        self.boost_primary = boost_primary
         self.embedder = Embedder(model_name)
-        self.use_fallback = False
-        self.collection = None
-        self.fallback_db_path = Path(persist_dir) / "fallback_db.json"
         
+        # Load ChromaDB
         try:
             import chromadb
+            os.makedirs(persist_dir, exist_ok=True)
             self.client = chromadb.PersistentClient(path=persist_dir)
-            self.collection = self.client.get_or_create_collection(name=collection_name)
+            self.collections = {
+                "knowledge": self.client.get_or_create_collection("karpathy_knowledge"),
+                "analogies": self.client.get_or_create_collection("karpathy_analogies"),
+                "reasoning_traces": self.client.get_or_create_collection("karpathy_reasoning"),
+                "teaching_style": self.client.get_or_create_collection("karpathy_teaching"),
+                "quotes": self.client.get_or_create_collection("karpathy_quotes")
+            }
         except Exception as e:
-            self.use_fallback = True
-            self._load_fallback_db()
+            print(f"ChromaDB init failed, using fallback: {e}")
 
-    def _load_fallback_db(self):
-        """Load fallback database"""
-        if self.fallback_db_path.exists():
-            with open(self.fallback_db_path, "r", encoding="utf-8") as f:
-                self.fallback_db = json.load(f)
-        else:
-            self.fallback_db = {"documents": [], "embeddings": [], "metadatas": [], "ids": []}
+    def classify_query(self, query: str) -> List[str]:
+        """Step 1: Classify the user's query into categories"""
+        categories = {
+            "conceptual": ["what", "why", "how", "explain", "concept", "principle", "theory"],
+            "technical": ["code", "implement", "algorithm", "model", "build", "debug"],
+            "research": ["paper", "scaling", "experiment", "study", "research"],
+            "debugging": ["error", "bug", "problem", "issue", "fix"],
+            "opinion": ["think", "believe", "opinion", "view", "prefer"],
+            "career": ["career", "job", "path", "advice", "learn"],
+            "philosophy": ["philosophy", "ethics", "future", "agi", "intelligence"]
+        }
+        
+        matches = []
+        query_lower = query.lower()
+        
+        for category, keywords in categories.items():
+            for keyword in keywords:
+                if keyword in query_lower:
+                    matches.append(category)
+                    break
+        
+        return matches if matches else ["conceptual"]
+
+    def retrieve_from_collection(
+        self,
+        collection_name: str,
+        query: str,
+        top_k: int = 3
+    ) -> List[Dict]:
+        """Retrieve from a specific collection"""
+        query_embedding = self.embedder.embed_text(query)
+        
+        try:
+            results = self.collections[collection_name].query(
+                query_embeddings=[query_embedding.tolist()],
+                n_results=top_k,
+                include=["documents", "metadatas", "distances"]
+            )
+            
+            processed = []
+            if results and results["ids"] and results["ids"][0]:
+                ids = results["ids"][0]
+                docs = results["documents"][0]
+                metas = results["metadatas"][0]
+                dists = results["distances"][0]
+                
+                for i in range(len(ids)):
+                    score = 1.0 / (1.0 + dists[i])
+                    processed.append({
+                        "chunk_id": ids[i],
+                        "text": docs[i],
+                        "metadata": metas[i],
+                        "score": score,
+                        "collection": collection_name
+                    })
+                    
+            return processed
+        except Exception as e:
+            print(f"Retrieval failed for {collection_name}: {e}")
+            return []
+
+    def rerank(self, query: str, results: List[Dict], top_k: int = 10) -> List[Dict]:
+        """Step 3: Simple reranking based on keyword match + score"""
+        query_lower = query.lower()
+        for res in results:
+            text_lower = res["text"].lower()
+            keyword_score = sum(
+                1 for token in re.findall(r'\b\w+\b', query_lower)
+                if token in text_lower
+            )
+            res["score"] *= 1.0 + (keyword_score / len(query_lower.split()))
+        
+        results_sorted = sorted(results, key=lambda x: x["score"], reverse=True)
+        return results_sorted[:top_k]
 
     def retrieve(
         self,
         query: str,
         top_k: Optional[int] = None,
         year_range: Optional[tuple] = None,
-    ) -> List[dict]:
-        """
-        Retrieve top-k chunks for a query.
-        
-        Args:
-            query: User's question
-            top_k: Override default
-            year_range: (start_year, end_year) to filter
-        
-        Returns:
-            List of result dicts with text, metadata, score
-        """
+    ) -> List[Dict]:
+        """Run full multi-collection retrieval pipeline"""
         k = top_k or self.top_k
-        query_embedding = self.embedder.embed_text(query)
         
-        if self.use_fallback:
-            return self._retrieve_fallback(query_embedding, k, year_range)
-            
-        # ChromaDB flow
-        if self.collection.count() == 0:
-            print("[Retriever] Warning: ChromaDB collection is empty!")
-            return []
-            
-        # Build metadata filter
-        where_filter = None
-        if year_range:
-            start_year, end_year = year_range
-            where_filter = {
-                "$and": [
-                    {"year": {"$gte": int(start_year)}},
-                    {"year": {"$lte": int(end_year)}}
-                ]
-            }
-            
-        try:
-            # Query ChromaDB
-            results = self.collection.query(
-                query_embeddings=[query_embedding.tolist()],
-                n_results=min(k * 2, self.collection.count()),
-                where=where_filter,
-                include=["documents", "metadatas", "distances"]
-            )
-        except Exception as e:
-            print(f"[Retriever] Query error: {e}. Attempting query without filters.")
-            try:
-                results = self.collection.query(
-                    query_embeddings=[query_embedding.tolist()],
-                    n_results=min(k * 2, self.collection.count()),
-                    include=["documents", "metadatas", "distances"]
-                )
-            except Exception as ex:
-                print(f"[Retriever] Final Query error: {ex}")
-                return []
-            
-        processed = []
-        if results and results["ids"] and results["ids"][0]:
-            ids = results["ids"][0]
-            documents = results["documents"][0]
-            metadatas = results["metadatas"][0]
-            distances = results["distances"][0]
-            
-            for i in range(len(ids)):
-                # L2 distance to similarity score
-                similarity = 1.0 / (1.0 + distances[i])
-                processed.append({
-                    "chunk_id": ids[i],
-                    "text": documents[i],
-                    "metadata": metadatas[i],
-                    "score": similarity,
-                })
-                
-        # Apply boosting & sorting
-        processed = self._apply_source_boosting(processed)
-        processed.sort(key=lambda x: x["score"], reverse=True)
-        return processed[:k]
+        # Step 1: Classify query
+        categories = self.classify_query(query)
+        
+        # Step 2: Retrieve from all relevant collections
+        all_results = []
+        for col in ["knowledge", "analogies", "reasoning_traces", "teaching_style", "quotes"]:
+            col_results = self.retrieve_from_collection(col, query, top_k=3)
+            all_results.extend(col_results)
+        
+        # Step 3: Rerank
+        final_results = self.rerank(query, all_results, top_k=k)
+        
+        return final_results
 
-    def _retrieve_fallback(self, query_emb: np.ndarray, k: int, year_range: Optional[tuple]) -> List[dict]:
-        """Perform vector retrieval using the JSON fallback DB"""
-        self._load_fallback_db()
-        if not self.fallback_db["documents"]:
-            return []
-            
-        processed = []
-        for i in range(len(self.fallback_db["ids"])):
-            metadata = self.fallback_db["metadatas"][i]
-            
-            # Apply year range filters
-            if year_range:
-                start_year, end_year = year_range
-                doc_year = metadata.get("year", 2023)
-                if not (start_year <= doc_year <= end_year):
-                    continue
-                    
-            db_emb = np.array(self.fallback_db["embeddings"][i])
-            # Cosine similarity = dot product of normalized vectors
-            dot_product = float(np.dot(query_emb, db_emb))
-            # Shift cosine similarity from [-1, 1] to [0, 1]
-            similarity = 0.5 + 0.5 * dot_product
-            
-            processed.append({
-                "chunk_id": self.fallback_db["ids"][i],
-                "text": self.fallback_db["documents"][i],
-                "metadata": metadata,
-                "score": similarity,
-            })
-            
-        processed = self._apply_source_boosting(processed)
-        processed.sort(key=lambda x: x["score"], reverse=True)
-        return processed[:k]
-
-    def _apply_source_boosting(self, results: List[dict]) -> List[dict]:
-        """Boost scores for primary source chunks"""
-        for result in results:
-            if result["metadata"].get("is_primary_source"):
-                result["score"] *= self.boost_primary
-        return results
-
-    def format_context(self, results: List[dict]) -> str:
-        """Format results into context string for LLM prompt"""
+    def format_context(self, results: List[Dict]) -> str:
+        """Format retrieved context nicely for the LLM"""
         if not results:
-            return "No relevant sources found in my works."
-        
-        context_parts = []
-        for i, result in enumerate(results, 1):
-            source = result["metadata"].get("source_title", "Unknown")
-            year = result["metadata"].get("year", "")
-            source_type = result["metadata"].get("source_type", "")
+            return "No relevant sources found."
             
-            header = f"[Source {i}: {source}"
-            if year:
-                header += f" ({year})"
-            if source_type:
-                header += f" — {source_type.upper()}"
-            header += "]"
+        grouped = {}
+        for res in results:
+            col = res.get("collection", "unknown")
+            if col not in grouped:
+                grouped[col] = []
+            grouped[col].append(res)
             
-            context_parts.append(f"{header}\n{result['text']}")
-        
-        return "\n\n---\n\n".join(context_parts)
+        parts = []
+        for col_name, items in grouped.items():
+            parts.append(f"--- {col_name.replace('_', ' ').title()} ---\n")
+            for i, item in enumerate(items):
+                parts.append(f"[{i+1}] {item['text']}\n")
+                
+        return "\n".join(parts)
