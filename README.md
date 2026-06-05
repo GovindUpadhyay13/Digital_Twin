@@ -51,6 +51,9 @@ This project employs a **multi-source data acquisition pipeline** to build a com
    - **Processing**: HTML is converted to markdown; metadata includes publication date for temporal filtering.
 
 
+#### 5. **Youtube videos Transcriptions**
+   - **YT Lectures and interviews**: Posts from Andrej's YT channel and his interviews.
+   - **Processing**: Transcripts are converted to structured Json to capture his resoning and talking style.
 
 
 ### Data Processing & Embedding Pipeline (`scripts/ingest_documents.py`)
