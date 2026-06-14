@@ -19,6 +19,7 @@ An interactive AI application built with **LangGraph**, **Gemini 2.5 Flash**, an
   - *Long-term (Semantic)*: Runs an asynchronous background extraction thread to deduce facts about the user (e.g., "The user is studying CUDA," "The user is building micrograd from scratch") and stores them as semantic embeddings in ChromaDB.
 - **Dynamic Memory Dashboard**: Exposes the internal state of the long-term memory system, logging semantic facts, past conversation histories, and key milestones to make the digital construct transparent and inspectable.
 - **Biographical Timeline Engine**: Detects time-anchored inputs (e.g., "What are you working on in 2018?") and constrains the RAG retriever to only pull historical data up to that year, adapting context based on temporal boundaries.
+- **Voicebox TTS Integration**: Offers on-demand cloned-voice synthesis mimicking Andrej's exact voice, powered by a locally running Voicebox desktop app. Users can click a speaker button on any message bubble to hear responses read aloud.
 
 ---
 
@@ -108,6 +109,11 @@ The system is constructed as a structured pipeline of modular subsystems. Rather
 - Provides a secure, production-grade key management class that parses rotating API keys dynamically from environment variables.
 - Supports multi-key strings (`GEMINI_API_KEYS="key1,key2,..."`) or individual indexes (`GEMINI_API_KEY_1` to `GEMINI_API_KEY_5`), rotating through them under lock-based synchronization to prevent rate-limiting.
 
+### 6. Voicebox TTS & Cadence Formatter (`audio/`)
+- **Voicebox Client**: A REST client interacting with the desktop app's `/generate` endpoint. Uses a 1.5s health check timeout to toggle visual status indicators non-invasively, and a 60s generation timeout to handle synthesis processing.
+- **Cadence Formatter**: Sanitizes response texts before synthesis. Strips markdown tokens, citation references, and replaces complex code blocks with spoken markers. It also expands conversational acronyms (`LLM` -> `large language model`, `RAG` -> `retrieval augmented generation`, etc.) to prevent unnatural phonetic pronunciation.
+- **Asynchronous Synthesis Threading**: The backend uses python's `asyncio.to_thread` to offload HTTP audio generation requests, guaranteeing that the primary FastAPI event loop remains completely unblocked.
+
 ---
 
 ## 🚀 Getting Started
@@ -130,6 +136,19 @@ The system is constructed as a structured pipeline of modular subsystems. Rather
    Copy `.env.example` to `.env` and insert your API keys:
    ```bash
    copy .env.example .env
+   ```
+
+### Voicebox TTS Integration (Optional)
+
+To enable the cloned voice feedback feature, you must have the local Voicebox desktop application running:
+1. Open the Voicebox desktop app (running on `http://127.0.0.1:17493`).
+2. Create a Voice Profile named `karpathy` using the **Qwen3-TTS 1.7B** engine.
+3. Import the five high-quality audio references located under `data/voice_reference/` to train the profile.
+4. Retrieve your Profile ID by querying the profiles endpoint: `curl http://127.0.0.1:17493/profiles`
+5. Configure these variables inside your `.env` file:
+   ```env
+   VOICEBOX_BASE_URL=http://127.0.0.1:17493
+   VOICEBOX_PROFILE_ID=<your-cloned-profile-id>
    ```
 
 ### Ingestion & Data Preparation
