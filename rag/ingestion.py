@@ -6,7 +6,7 @@ from rag.embedder import Embedder
 from rag.preprocessor import DocumentPreprocessor
 
 class RAGIngestor:
-    def __init__(self, persist_dir: str = "storage/chroma_db", collection_name: str = "karpathy_knowledge"):
+    def __init__(self, persist_dir: str = "./data/chroma", collection_name: str = "karpathy_knowledge"):
         self.persist_dir = persist_dir
         self.collection_name = collection_name
         self.chunker = TextChunker(chunk_size=512, overlap=50)

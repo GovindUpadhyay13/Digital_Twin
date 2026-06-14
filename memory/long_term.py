@@ -9,7 +9,7 @@ class LongTermMemory:
     def __init__(
         self,
         model_name: str = "all-MiniLM-L6-v2",
-        persist_dir: str = "storage/chroma_db",
+        persist_dir: str = "./data/chroma",
     ):
         self.persist_dir = persist_dir
         from rag.embedder import get_embedder

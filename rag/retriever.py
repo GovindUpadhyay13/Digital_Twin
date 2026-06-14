@@ -6,7 +6,7 @@ class Retriever:
     def __init__(
         self,
         model_name: str = "all-MiniLM-L6-v2",
-        persist_dir: str = "storage/chroma_db",
+        persist_dir: str = "./data/chroma",
         collection_name: str = "karpathy_knowledge",
         top_k: int = 5,
         *args,
