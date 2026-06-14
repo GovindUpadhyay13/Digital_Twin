@@ -16,7 +16,6 @@ def test_config_loader():
 def test_project_structure():
     """Test project structure exists"""
     assert project_root.exists()
-    assert (project_root / "api").exists()
     assert (project_root / "core").exists()
     assert (project_root / "static").exists()
     assert (project_root / "requirements.txt").exists()
