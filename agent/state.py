@@ -22,7 +22,8 @@ class AgentState(TypedDict):
     
     # Conversation history
     messages: List[BaseMessage]
-    conversation_summary: str
+    system_prompt_cache: str
+    short_term_summary: str
     
     # Final output
     response: str
@@ -31,3 +32,5 @@ class AgentState(TypedDict):
     # Metadata
     is_valid: bool
     validation_issues: List[str]
+    retry_count: int
+    severity: str

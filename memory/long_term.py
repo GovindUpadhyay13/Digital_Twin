@@ -12,7 +12,8 @@ class LongTermMemory:
         persist_dir: str = "storage/chroma_db",
     ):
         self.persist_dir = persist_dir
-        self.embedder = Embedder(model_name)
+        from rag.embedder import get_embedder
+        self.embedder = get_embedder(model_name)
         self.use_fallback = False
         self.client = None
         

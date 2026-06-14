@@ -5,6 +5,16 @@ from typing import Optional, List, Dict
 from pathlib import Path
 from rag.embedder import Embedder
 
+CATEGORY_COLLECTION_WEIGHTS = {
+    "technical": {"knowledge": 1.5, "reasoning_traces": 1.2, "analogies": 0.8, "teaching_style": 0.8, "quotes": 0.5},
+    "opinion":   {"quotes": 1.5, "reasoning_traces": 1.3, "knowledge": 0.8, "analogies": 0.8, "teaching_style": 0.8},
+    "conceptual":{"teaching_style": 1.3, "analogies": 1.3, "knowledge": 1.0, "reasoning_traces": 1.0, "quotes": 0.7},
+    "research":  {"knowledge": 1.5, "reasoning_traces": 1.2, "quotes": 0.6, "analogies": 0.7, "teaching_style": 0.7},
+    "career":    {"quotes": 1.3, "reasoning_traces": 1.2, "teaching_style": 1.1, "knowledge": 0.8, "analogies": 0.8},
+    "debugging": {"knowledge": 1.4, "reasoning_traces": 1.3, "teaching_style": 1.0, "analogies": 0.7, "quotes": 0.5},
+    "philosophy":{"quotes": 1.4, "reasoning_traces": 1.3, "knowledge": 0.9, "teaching_style": 0.9, "analogies": 0.8},
+}
+
 
 class Retriever:
     def __init__(
@@ -19,7 +29,9 @@ class Retriever:
     ):
         self.persist_dir = persist_dir
         self.top_k = top_k
-        self.embedder = Embedder(model_name)
+        self.boost_primary = boost_primary
+        from rag.embedder import get_embedder
+        self.embedder = get_embedder(model_name)
         
         # Load ChromaDB
         try:
@@ -84,6 +96,11 @@ class Retriever:
                 
                 for i in range(len(ids)):
                     score = 1.0 / (1.0 + dists[i])
+                    
+                    source_type = metas[i].get("source_type", metas[i].get("type", "unknown"))
+                    if source_type in {"paper", "github_repo", "official_blog", "blog"}:
+                        score *= self.boost_primary
+                        
                     processed.append({
                         "chunk_id": ids[i],
                         "text": docs[i],
@@ -123,10 +140,17 @@ class Retriever:
         # Step 1: Classify query
         categories = self.classify_query(query)
         
+        collection_weights = {}
+        for col in ["knowledge", "analogies", "reasoning_traces", "teaching_style", "quotes"]:
+            weights = [CATEGORY_COLLECTION_WEIGHTS.get(cat, {}).get(col, 1.0) for cat in categories]
+            collection_weights[col] = sum(weights) / len(weights) if weights else 1.0
+        
         # Step 2: Retrieve from all relevant collections
         all_results = []
         for col in ["knowledge", "analogies", "reasoning_traces", "teaching_style", "quotes"]:
             col_results = self.retrieve_from_collection(col, query, top_k=3)
+            for res in col_results:
+                res["score"] *= collection_weights[col]
             all_results.extend(col_results)
         
         # Step 3: Rerank
@@ -147,9 +171,11 @@ class Retriever:
             grouped[col].append(res)
             
         parts = []
+        global_index = 1
         for col_name, items in grouped.items():
             parts.append(f"--- {col_name.replace('_', ' ').title()} ---\n")
-            for i, item in enumerate(items):
-                parts.append(f"[{i+1}] {item['text']}\n")
+            for item in items:
+                parts.append(f"[{global_index}] {item['text']}\n")
+                global_index += 1
                 
         return "\n".join(parts)

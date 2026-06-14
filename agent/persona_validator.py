@@ -61,3 +61,7 @@ class PersonaValidator:
         fixed_text = fixed_text.strip()
         
         return fixed_text
+
+    def build_correction_instruction(self, issues: List[str]) -> str:
+        """Instruction for LLM retry if it failed validation"""
+        return "Your previous response broke character: " + ", ".join(issues) + ". Rewrite the response from Andrej's first-person perspective without any AI self-references."

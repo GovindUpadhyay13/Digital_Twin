@@ -31,6 +31,7 @@ ENV/
 
 # Vector DB and storage
 storage/
+storage/audio/
 chroma_db/
 *.db
 *.sqlite
@@ -44,6 +45,7 @@ data/raw/blog/
 data/raw/github/
 data/raw/papers/
 data/scraped_tweets.csv
+data/voice_reference/
 
 # IDE
 .vscode/

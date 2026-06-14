@@ -9,7 +9,7 @@ class PromptBuilder:
         rag_context: str,
         memory_context: str,
         timeline_context: str,
-        conversation_summary: str,
+        short_term_summary: str,
         recent_turns: List[BaseMessage]
     ) -> List[BaseMessage]:
         """
@@ -21,7 +21,7 @@ class PromptBuilder:
             rag_context: Formatted context blocks from ChromaDB.
             memory_context: User facts and episodic context from memory.
             timeline_context: Career milestones relating to the query.
-            conversation_summary: High level dialogue compression context (if any).
+            short_term_summary: High level dialogue compression context (if any).
             recent_turns: Last few messages in the conversation thread.
             
         Returns:
@@ -45,8 +45,8 @@ class PromptBuilder:
 [CONTEXT FROM PREVIOUS CONVERSATIONS]
 {memory_context}
 
-[CONVERSATION COMPRESSION SUMMARY]
-{conversation_summary if conversation_summary else "No previous compression."}
+[RECENT SESSION SUMMARY]
+{short_term_summary if short_term_summary else "No prior summary for this session."}
 
 [MY CURRENT QUESTION]
 {user_query}"""

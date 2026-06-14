@@ -132,6 +132,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 text-xs font-mono text-ktextmuted">
+                <span id="voice-status-dot" class="hidden text-ksuccess text-[10px]" title="Voicebox connected">●</span>
                 <span class="px-2 py-1 rounded bg-kelevated border border-kborder">Conversational</span>
             </div>
         </header>
@@ -344,7 +345,10 @@
                 <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
                     <img src="https://avatars.githubusercontent.com/u/241138?v=4" class="w-8 h-8 rounded-full border border-kborder mt-1 shadow-sm shrink-0">
                     <div class="glass border border-kprimary/20 rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg flex-1 overflow-hidden">
-                        <div class="prose prose-invert max-w-none text-sm">${renderMarkdown(content)}</div>
+                        <div class="flex justify-between items-start">
+                            <div class="prose prose-invert max-w-none text-sm w-full">${renderMarkdown(content)}</div>
+                            <button class="speaker-btn hover:opacity-100 transition-opacity" data-raw-text="${encodeURIComponent(content)}" onclick="playVoice(this)" style="background: none; border: none; cursor: pointer; opacity: 0.4; font-size: 0.8em; margin-left: 6px; vertical-align: middle;">🔊</button>
+                        </div>
                         ${sources && sources.length > 0 ? renderSourcesHTML(sources) : ''}
                     </div>
                 </div>
@@ -361,8 +365,9 @@
 
         // --- Renderers ---
         function renderMarkdown(text) {
+            let withCitations = text.replace(/\[(\d+)\]/g, '<sup class="citation-badge cursor-pointer font-mono text-[10px] bg-kelevated border border-kborder px-1 rounded ml-0.5 text-kprimary hover:bg-kprimary/20" data-source="$1">[$1]</sup>');
             // First run marked
-            let html = marked.parse(text);
+            let html = marked.parse(withCitations);
             // Purify for safety
             html = DOMPurify.sanitize(html);
             // Note: In a real advanced setup, KaTeX parsing happens before/during marked, 
@@ -515,7 +520,73 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
+        // Setup event delegation for citations
+        elChatContainer.addEventListener('click', (e) => {
+            const badge = e.target.closest('.citation-badge');
+            if (badge) {
+                switchTab('sources');
+            }
+        });
+
+        async function checkVoiceStatus() {
+            try {
+                const res = await fetch('/api/voice/status');
+                const data = await res.json();
+                if (data.available) {
+                    const dot = document.getElementById('voice-status-dot');
+                    if (dot) dot.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Voice status check failed", err);
+            }
+        }
+
+        async function playVoice(btn) {
+            try {
+                const resStatus = await fetch('/api/voice/status');
+                const status = await resStatus.json();
+                if (!status.available) {
+                    showToast("Start Voicebox app to enable voice");
+                    return;
+                }
+
+                btn.innerText = '⏳';
+                btn.disabled = true;
+                const text = decodeURIComponent(btn.getAttribute('data-raw-text'));
+
+                const res = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+
+                if (!res.ok) throw new Error("TTS failed");
+
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                
+                audio.onended = () => {
+                    URL.revokeObjectURL(url);
+                    btn.innerText = '🔊';
+                    btn.disabled = false;
+                };
+                
+                audio.play().catch(err => {
+                    console.error("Audio playback failed", err);
+                    btn.innerText = '🔊';
+                    btn.disabled = false;
+                });
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to play audio");
+                btn.innerText = '🔊';
+                btn.disabled = false;
+            }
+        }
+
         // Boot
+        document.addEventListener('DOMContentLoaded', checkVoiceStatus);
         initApp();
     </script>
 </body>

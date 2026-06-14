@@ -68,7 +68,8 @@ def memory_node(
     
     return {
         "memory_context": memory_context,
-        "user_facts": user_facts
+        "user_facts": user_facts,
+        "short_term_summary": memory.short_term.get_compressed_summary()
     }
 
 
@@ -102,21 +103,21 @@ def persona_prompt_node(
         rag_context=state["rag_context"],
         memory_context=state["memory_context"],
         timeline_context=state["timeline_context"],
-        conversation_summary=state.get("conversation_summary", ""),
+        short_term_summary=state.get("short_term_summary", ""),
         recent_turns=recent_turns,
     )
     
     return {
         "messages": conversation_history,
         # Keep track of system prompt in state
-        "conversation_summary": system_prompt
+        "system_prompt_cache": system_prompt
     }
 
 
 def llm_node(state: AgentState) -> dict:
     """Call Gemini to generate response, with solid fallback"""
     api_key = os.environ.get("GEMINI_API_KEY")
-    system_instruction = state.get("conversation_summary") or get_system_prompt()
+    system_instruction = state.get("system_prompt_cache") or get_system_prompt()
     
     # Define fallback response generator
     def get_fallback_response(q):
@@ -214,10 +215,21 @@ def validation_node(
         # Re-evaluate
         validation = validator.validate(response_text)
         
+    retry_count = state.get("retry_count", 0)
+    messages = state.get("messages", [])
+    
+    if validation["severity"] == "major" and retry_count < 1:
+        correction = validator.build_correction_instruction(validation["issues"])
+        messages.append(HumanMessage(content=correction))
+        retry_count += 1
+        
     return {
         "response": response_text,
         "is_valid": validation["is_valid"],
-        "validation_issues": validation["issues"]
+        "validation_issues": validation["issues"],
+        "severity": validation["severity"],
+        "retry_count": retry_count,
+        "messages": messages
     }
 
 

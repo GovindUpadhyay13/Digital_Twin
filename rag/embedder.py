@@ -1,4 +1,12 @@
 import numpy as np
+from typing import Dict, List
+
+_embedder_cache: Dict[str, "Embedder"] = {}
+
+def get_embedder(model_name: str):
+    if model_name not in _embedder_cache:
+        _embedder_cache[model_name] = Embedder(model_name)
+    return _embedder_cache[model_name]
 
 class Embedder:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):

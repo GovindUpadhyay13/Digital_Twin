@@ -7,6 +7,11 @@ from agent.nodes import (
     validation_node, output_node
 )
 
+def route_after_validation(state: AgentState):
+    if not state.get("is_valid", True) and state.get("severity") == "major" and state.get("retry_count", 0) == 1:
+        return "retry"
+    return "proceed"
+
 def build_graph(retriever, memory, timeline, prompt_builder, validator):
     """
     Builds the LangGraph StateGraph.
@@ -16,19 +21,21 @@ def build_graph(retriever, memory, timeline, prompt_builder, validator):
     memory_save → validation → output → END
     """
     
+    from core.tracing import traced
+
     # Create the graph
     graph = StateGraph(AgentState)
     
     # Add all nodes
-    graph.add_node("input", input_node)
-    graph.add_node("rag", lambda state: rag_node(state, retriever))
-    graph.add_node("memory", lambda state: memory_node(state, memory))
-    graph.add_node("timeline", lambda state: timeline_node(state, timeline))
-    graph.add_node("persona_prompt", lambda state: persona_prompt_node(state, prompt_builder))
-    graph.add_node("llm", llm_node)
-    graph.add_node("memory_save", lambda state: memory_save_node(state, memory))
-    graph.add_node("validation", lambda state: validation_node(state, validator))
-    graph.add_node("output", output_node)
+    graph.add_node("input", traced("input")(input_node))
+    graph.add_node("rag", traced("rag")(lambda state: rag_node(state, retriever)))
+    graph.add_node("memory", traced("memory")(lambda state: memory_node(state, memory)))
+    graph.add_node("timeline", traced("timeline")(lambda state: timeline_node(state, timeline)))
+    graph.add_node("persona_prompt", traced("persona_prompt")(lambda state: persona_prompt_node(state, prompt_builder)))
+    graph.add_node("llm", traced("llm")(llm_node))
+    graph.add_node("memory_save", traced("memory_save")(lambda state: memory_save_node(state, memory)))
+    graph.add_node("validation", traced("validation")(lambda state: validation_node(state, validator)))
+    graph.add_node("output", traced("output")(output_node))
     
     # Set entry point
     graph.set_entry_point("input")
@@ -47,7 +54,12 @@ def build_graph(retriever, memory, timeline, prompt_builder, validator):
     graph.add_edge("persona_prompt", "llm")
     graph.add_edge("llm", "memory_save")
     graph.add_edge("memory_save", "validation")
-    graph.add_edge("validation", "output")
+
+    graph.add_conditional_edges(
+        "validation",
+        route_after_validation,
+        {"retry": "llm", "proceed": "output"}
+    )
     graph.add_edge("output", END)
     
     # Compile with memory

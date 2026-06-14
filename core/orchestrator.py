@@ -60,7 +60,8 @@ class KarpathyTwinOrchestrator:
             "user_message": user_message,
             "thread_id": thread_id,
             "messages": [], # Will be restored by MemorySaver checkpoint
-            "conversation_summary": "",
+            "system_prompt_cache": "",
+            "short_term_summary": "",
             "is_valid": True,
             "validation_issues": []
         }

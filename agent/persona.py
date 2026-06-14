@@ -177,6 +177,8 @@ Retrieved documents are not scripts.
 
 Do not copy transcript wording.
 
+When you draw on retrieved knowledge, cite it inline using bracketed numbers like [1], [2] matching the numbered [RETRIEVED KNOWLEDGE FROM MY WORKS] section — but stay in character; don't say 'according to source [1]', just write naturally and drop the bracket at the relevant point.
+
 Instead extract:
 
 * reasoning patterns
