@@ -70,13 +70,6 @@
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
-        /* Custom Accordion */
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.open { max-height: 500px; overflow-y: auto; }
-        
-        .source-card { transition: transform 0.2s; }
-        .source-card:hover { transform: translateY(-2px); }
-
         .btn-focus:focus-visible { outline: 2px solid #58A6FF; outline-offset: 2px; }
     </style>
 </head>
@@ -91,17 +84,13 @@
                 <div class="absolute bottom-0 right-2 w-4 h-4 bg-ksuccess border-2 border-ksurface rounded-full z-20"></div>
             </div>
             <h1 class="font-semibold text-xl tracking-tight">Andrej Karpathy</h1>
-            <p class="text-xs text-ktextmuted text-center mt-1">Digital Twin · Powered by LangGraph + Gemini</p>
+            <p class="text-xs text-ktextmuted text-center mt-1">Digital Twin · Powered by Gemini</p>
         </div>
         
         <nav class="flex-1 overflow-y-auto p-4 space-y-2">
             <button onclick="switchTab('chat')" id="tab-chat" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-kprimary bg-kelevated font-medium text-sm transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                 <span>Chat</span>
-            </button>
-            <button onclick="switchTab('sources')" id="tab-sources" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-ktextmuted hover:text-ktext hover:bg-kelevated/50 font-medium text-sm transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                <span>Sources Explorer</span>
             </button>
             <button onclick="switchTab('settings')" id="tab-settings" class="btn-focus w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-ktextmuted hover:text-ktext hover:bg-kelevated/50 font-medium text-sm transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -131,8 +120,14 @@
                     <p class="text-xs text-ktextmuted hidden sm:block">Ask about neural nets, LLMs, autonomous driving, or his lectures.</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 text-xs font-mono text-ktextmuted">
+            <div class="flex items-center gap-3 text-xs font-mono text-ktextmuted">
+                <!-- Voicebox connection status indicator dot -->
                 <span id="voice-status-dot" class="hidden text-ksuccess text-[10px]" title="Voicebox connected">●</span>
+                <!-- Voice Mode Toggle Button -->
+                <button id="voice-toggle-btn" onclick="toggleVoice()" class="px-2 py-1 rounded bg-kelevated border border-kborder text-xs font-mono text-ktextmuted flex items-center gap-1.5 hover:text-white transition-colors" title="Toggle Voice Response">
+                    <span id="voice-toggle-icon">🔇</span>
+                    <span>Voice</span>
+                </button>
                 <span class="px-2 py-1 rounded bg-kelevated border border-kborder">Conversational</span>
             </div>
         </header>
@@ -163,17 +158,6 @@
                 </div>
             </div>
 
-            <!-- Sources Explorer View -->
-            <div id="view-sources" class="absolute inset-0 h-full hidden overflow-y-auto p-6 hide-scroll">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-2">Sources Explorer</h2>
-                    <p class="text-sm text-ktextmuted mb-6">Aggregated view of every unique source cited in this session.</p>
-                    <div id="all-sources-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Sources injected here -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Settings View -->
             <div id="view-settings" class="absolute inset-0 h-full hidden overflow-y-auto p-6 hide-scroll">
                 <div class="max-w-2xl mx-auto">
@@ -184,12 +168,6 @@
                             <h3 class="font-semibold mb-2">Session Management</h3>
                             <p class="text-sm text-ktextmuted mb-4">Your current Session ID: <code id="display-session-id" class="bg-kcodebg px-1 py-0.5 rounded text-kprimary select-all"></code></p>
                             <button onclick="clearSession()" class="px-4 py-2 bg-red-900/50 text-red-200 border border-red-800 rounded-lg text-sm hover:bg-red-900 transition-colors">Clear Session Memory</button>
-                        </div>
-                        
-                        <div class="bg-ksurface border border-kborder rounded-lg p-5">
-                            <h3 class="font-semibold mb-2">Appearance</h3>
-                            <p class="text-sm text-ktextmuted mb-4">Toggle light/dark mode (Dark mode strictly recommended for hacker vibe).</p>
-                            <button onclick="toggleTheme()" class="px-4 py-2 bg-kelevated border border-kborder rounded-lg text-sm hover:bg-kborder transition-colors">Toggle Theme</button>
                         </div>
                     </div>
                 </div>
@@ -205,7 +183,7 @@
             messages: [],
             isLoading: false,
             activeTab: 'chat',
-            allSources: []
+            voiceEnabled: localStorage.getItem('voice_enabled') === 'true'
         };
 
         // DOM Elements
@@ -216,6 +194,8 @@
 
         // Init App
         async function initApp() {
+            updateVoiceUI();
+            
             if (!state.sessionId) {
                 await newSession(false);
             }
@@ -225,12 +205,14 @@
             const savedMessages = localStorage.getItem(`karpathy_messages_${state.sessionId}`);
             if (savedMessages) {
                 state.messages = JSON.parse(savedMessages);
-                state.messages.forEach(msg => appendMessage(msg.role, msg.content, msg.sources, false));
+                state.messages.forEach(msg => appendMessage(msg.role, msg.content, false));
             } else {
                 // Show welcome message
-                appendMessage('bot', "Hey! I'm Andrej's digital twin. I've been trained on his lectures, blog posts, tweets, and papers. Ask me anything — from backprop fundamentals to the future of LLMs.", null, false);
+                appendMessage('bot', "Hey! I'm Andrej's digital twin. I've been trained on his lectures, blog posts, tweets, and papers. Ask me anything — from backprop fundamentals to the future of LLMs.", false);
                 showSuggestedPrompts();
             }
+            
+            checkVoiceboxAvailability();
         }
 
         async function newSession(promptClear = true) {
@@ -241,7 +223,6 @@
                 state.sessionId = data.session_id;
                 localStorage.setItem('karpathy_session_id', state.sessionId);
                 state.messages = [];
-                state.allSources = [];
                 elChatContainer.innerHTML = '';
                 initApp();
             } catch (e) {
@@ -286,42 +267,80 @@
             hideSuggestedPrompts();
             
             // User Message
-            const userMsg = { role: 'user', content: text, sources: null };
+            const userMsg = { role: 'user', content: text };
             state.messages.push(userMsg);
-            appendMessage(userMsg.role, userMsg.content, userMsg.sources);
+            appendMessage(userMsg.role, userMsg.content);
             saveMessages();
+            
             state.isLoading = true;
             elSendBtn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
             
             const indicatorId = showTypingIndicator();
+            const botMessageId = 'bot-msg-' + Date.now();
 
             try {
-                const res = await fetch('/api/chat', {
+                // Fetch with streaming (SSE)
+                const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ session_id: state.sessionId, message: text })
                 });
                 
-                if (!res.ok) throw new Error("API Error");
-                
-                const data = await res.json();
+                if (!response.ok) throw new Error("API Error");
+
                 hideTypingIndicator(indicatorId);
-                const botMsg = { role: 'bot', content: data.response, sources: data.sources };
-                state.messages.push(botMsg);
-                appendMessage(botMsg.role, botMsg.content, botMsg.sources);
-                saveMessages();
-                
-                // Track sources
-                if (data.sources) {
-                    data.sources.forEach(s => {
-                        if (!state.allSources.find(x => x.title === s.title)) {
-                            state.allSources.push(s);
+                appendBotMessagePlaceholder(botMessageId);
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+                let fullText = "";
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    // Keep the last partial line in the buffer
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed) continue;
+                        if (trimmed.startsWith("data: ")) {
+                            const dataStr = trimmed.slice(6);
+                            if (dataStr === "[DONE]") {
+                                break;
+                            }
+                            try {
+                                const parsed = JSON.parse(dataStr);
+                                if (parsed.text) {
+                                    fullText += parsed.text;
+                                    updateBotMessage(botMessageId, fullText);
+                                } else if (parsed.error) {
+                                    fullText += `\n⚠️ [Error: ${parsed.error}]`;
+                                    updateBotMessage(botMessageId, fullText);
+                                }
+                            } catch (e) {
+                                console.warn("Failed to parse SSE JSON", dataStr, e);
+                            }
                         }
-                    });
-                    updateSourcesExplorer();
+                    }
+                }
+
+                // Append the fully streamed message to session state
+                const botMsg = { role: 'bot', content: fullText };
+                state.messages.push(botMsg);
+                saveMessages();
+
+                // Call Voicebox if voice toggle is on
+                if (state.voiceEnabled && fullText) {
+                    speakWithVoicebox(fullText);
                 }
 
             } catch (err) {
+                console.error(err);
                 hideTypingIndicator(indicatorId);
                 appendMessage('bot', "⚠️ Sorry, I encountered an error connecting to the backend.");
                 showToast("Chat request failed.");
@@ -331,7 +350,7 @@
             }
         }
 
-        function appendMessage(role, content, sources = null, animate = true) {
+        function appendMessage(role, content, animate = true) {
             const wrapper = document.createElement('div');
             wrapper.className = `flex w-full ${role === 'user' ? 'justify-end' : 'justify-start'} ${animate ? 'animate-slide-up' : ''}`;
             
@@ -345,11 +364,7 @@
                 <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
                     <img src="https://avatars.githubusercontent.com/u/241138?v=4" class="w-8 h-8 rounded-full border border-kborder mt-1 shadow-sm shrink-0">
                     <div class="glass border border-kprimary/20 rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg flex-1 overflow-hidden">
-                        <div class="flex justify-between items-start">
-                            <div class="prose prose-invert max-w-none text-sm w-full">${renderMarkdown(content)}</div>
-                            <button class="speaker-btn hover:opacity-100 transition-opacity" data-raw-text="${encodeURIComponent(content)}" onclick="playVoice(this)" style="background: none; border: none; cursor: pointer; opacity: 0.4; font-size: 0.8em; margin-left: 6px; vertical-align: middle;">🔊</button>
-                        </div>
-                        ${sources && sources.length > 0 ? renderSourcesHTML(sources) : ''}
+                        <div class="prose prose-invert max-w-none text-sm w-full">${renderMarkdown(content)}</div>
                     </div>
                 </div>
                 `;
@@ -359,19 +374,40 @@
             scrollToBottom();
         }
 
+        function appendBotMessagePlaceholder(id) {
+            const wrapper = document.createElement('div');
+            wrapper.id = id;
+            wrapper.className = `flex w-full justify-start animate-slide-up`;
+            wrapper.innerHTML = `
+                <div class="flex gap-3 max-w-[90%] md:max-w-[80%]">
+                    <img src="https://avatars.githubusercontent.com/u/241138?v=4" class="w-8 h-8 rounded-full border border-kborder mt-1 shadow-sm shrink-0">
+                    <div class="glass border border-kprimary/20 rounded-2xl rounded-tl-sm px-5 py-4 shadow-lg flex-1 overflow-hidden">
+                        <div class="prose prose-invert max-w-none text-sm w-full markdown-body">Andrej is thinking...</div>
+                    </div>
+                </div>
+            `;
+            elChatContainer.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function updateBotMessage(id, text) {
+            const wrapper = document.getElementById(id);
+            if (!wrapper) return;
+            const container = wrapper.querySelector('.markdown-body');
+            if (container) {
+                container.innerHTML = renderMarkdown(text);
+            }
+            scrollToBottom();
+        }
+
         function saveMessages() {
             localStorage.setItem(`karpathy_messages_${state.sessionId}`, JSON.stringify(state.messages));
         }
 
         // --- Renderers ---
         function renderMarkdown(text) {
-            let withCitations = text.replace(/\[(\d+)\]/g, '<sup class="citation-badge cursor-pointer font-mono text-[10px] bg-kelevated border border-kborder px-1 rounded ml-0.5 text-kprimary hover:bg-kprimary/20" data-source="$1">[$1]</sup>');
-            // First run marked
-            let html = marked.parse(withCitations);
-            // Purify for safety
+            let html = marked.parse(text);
             html = DOMPurify.sanitize(html);
-            // Note: In a real advanced setup, KaTeX parsing happens before/during marked, 
-            // but for simplicity here we assume standard code blocks.
             setTimeout(() => {
                 document.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightElement(block);
@@ -380,63 +416,74 @@
             return html;
         }
 
-        function renderSourcesHTML(sources) {
-            const id = 'acc-' + Math.random().toString(36).substr(2, 9);
-            const sourceCards = sources.map(s => {
-                let badgeColor = 'bg-gray-600';
-                if(s.type === 'blog') badgeColor = 'bg-blue-600';
-                if(s.type === 'tweet') badgeColor = 'bg-sky-500';
-                if(s.type === 'paper') badgeColor = 'bg-purple-600';
-                
-                const percent = Math.min(100, Math.max(0, s.relevance * 100));
-                
-                return `
-                <div class="source-card bg-kcodebg border border-kborder rounded p-3 flex flex-col gap-2 mt-2">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded text-white ${badgeColor}">${s.type}</span>
-                            <span class="font-mono text-xs text-white truncate max-w-[150px] md:max-w-[250px]" title="${s.title}">${s.title}</span>
-                        </div>
-                        <span class="font-mono text-[10px] text-ktextmuted">${s.year}</span>
-                    </div>
-                    <div class="w-full bg-kborder rounded-full h-1.5 mt-1 overflow-hidden">
-                        <div class="bg-gradient-to-r from-kprimary to-ksecondary h-1.5 rounded-full" style="width: ${percent}%"></div>
-                    </div>
-                    <div class="text-[9px] text-ktextmuted font-mono text-right">Relevance: ${(s.relevance).toFixed(2)}</div>
-                </div>
-                `;
-            }).join('');
-
-            return `
-            <div class="mt-4 border-t border-kborder/50 pt-3">
-                <button onclick="document.getElementById('${id}').classList.toggle('open')" class="flex items-center gap-2 text-xs text-ktextmuted hover:text-kprimary transition-colors font-mono btn-focus rounded px-1 -ml-1">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                    Sources (${sources.length})
-                </button>
-                <div id="${id}" class="accordion-content">
-                    ${sourceCards}
-                </div>
-            </div>
-            `;
+        // --- Voicebox Integration ---
+        async function checkVoiceboxAvailability() {
+            try {
+                // Try querying profiles directly from user browser
+                const response = await fetch('http://127.0.0.1:17493/profiles', { method: 'GET' });
+                if (response.ok) {
+                    const dot = document.getElementById('voice-status-dot');
+                    if (dot) dot.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.log("Voicebox not running locally at http://127.0.0.1:17493");
+            }
         }
 
-        function updateSourcesExplorer() {
-            const container = document.getElementById('all-sources-container');
-            container.innerHTML = state.allSources.map(s => {
-                let badgeColor = 'bg-gray-600';
-                if(s.type === 'blog') badgeColor = 'bg-blue-600';
-                if(s.type === 'tweet') badgeColor = 'bg-sky-500';
-                if(s.type === 'paper') badgeColor = 'bg-purple-600';
-                return `
-                <div class="bg-ksurface border border-kborder rounded-lg p-4 hover:border-kprimary/50 transition-colors">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-bold tracking-wider uppercase px-2 py-1 rounded text-white ${badgeColor}">${s.type}</span>
-                        <span class="font-mono text-xs text-ktextmuted">${s.year}</span>
-                    </div>
-                    <h3 class="font-mono text-sm text-white mb-2">${s.title}</h3>
-                </div>
-                `;
-            }).join('');
+        function toggleVoice() {
+            state.voiceEnabled = !state.voiceEnabled;
+            localStorage.setItem('voice_enabled', state.voiceEnabled);
+            updateVoiceUI();
+            if (state.voiceEnabled) {
+                showToast("Voice enabled");
+                checkVoiceboxAvailability();
+            } else {
+                showToast("Voice disabled");
+            }
+        }
+
+        function updateVoiceUI() {
+            const icon = document.getElementById('voice-toggle-icon');
+            const btn = document.getElementById('voice-toggle-btn');
+            if (state.voiceEnabled) {
+                icon.innerText = '🔊';
+                btn.classList.add('text-kprimary', 'border-kprimary/50');
+                btn.classList.remove('text-ktextmuted');
+            } else {
+                icon.innerText = '🔇';
+                btn.classList.remove('text-kprimary', 'border-kprimary/50');
+                btn.classList.add('text-ktextmuted');
+            }
+        }
+
+        async function speakWithVoicebox(text) {
+            // Strip markdown, codes, and URLs to make speech natural
+            let cleanText = text
+                .replace(/```[\s\S]*?```/g, "code block omitted for audio")
+                .replace(/`([^`]+)`/g, "$1")
+                .replace(/\*\*([^*]+)\*\*/g, "$1")
+                .replace(/\*([^*]+)\*/g, "$1")
+                .replace(/\[\d+\]/g, "")
+                .replace(/https?:\/\/[^\s]+/g, "link");
+
+            try {
+                const response = await fetch('http://127.0.0.1:17493/speak', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Voicebox-Client-Id': 'karpathy-twin'
+                    },
+                    body: JSON.stringify({
+                        text: cleanText,
+                        profile: "Andrej Karpathy"
+                    })
+                });
+                if (!response.ok) {
+                    console.warn('Voicebox not running or profile not found');
+                }
+            } catch (e) {
+                console.warn('Voicebox not available:', e.message);
+            }
         }
 
         // --- UI Helpers ---
@@ -487,7 +534,7 @@
         }
 
         function switchTab(tabId) {
-            ['chat', 'sources', 'settings'].forEach(t => {
+            ['chat', 'settings'].forEach(t => {
                 document.getElementById('view-' + t).classList.add('hidden');
                 document.getElementById('tab-' + t).classList.remove('text-kprimary', 'bg-kelevated');
                 document.getElementById('tab-' + t).classList.add('text-ktextmuted');
@@ -499,11 +546,6 @@
             if(window.innerWidth < 768) {
                 elSidebar.classList.add('-translate-x-full');
             }
-        }
-
-        function toggleTheme() {
-            // Placeholder: currently hardcoded to dark for the lab theme.
-            showToast("Light mode is un-hacker-like! (Theme fixed to dark)");
         }
 
         function escapeHTML(str) {
@@ -520,73 +562,7 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // Setup event delegation for citations
-        elChatContainer.addEventListener('click', (e) => {
-            const badge = e.target.closest('.citation-badge');
-            if (badge) {
-                switchTab('sources');
-            }
-        });
-
-        async function checkVoiceStatus() {
-            try {
-                const res = await fetch('/api/voice/status');
-                const data = await res.json();
-                if (data.available) {
-                    const dot = document.getElementById('voice-status-dot');
-                    if (dot) dot.classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error("Voice status check failed", err);
-            }
-        }
-
-        async function playVoice(btn) {
-            try {
-                const resStatus = await fetch('/api/voice/status');
-                const status = await resStatus.json();
-                if (!status.available) {
-                    showToast("Start Voicebox app to enable voice");
-                    return;
-                }
-
-                btn.innerText = '⏳';
-                btn.disabled = true;
-                const text = decodeURIComponent(btn.getAttribute('data-raw-text'));
-
-                const res = await fetch('/api/tts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: text })
-                });
-
-                if (!res.ok) throw new Error("TTS failed");
-
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const audio = new Audio(url);
-                
-                audio.onended = () => {
-                    URL.revokeObjectURL(url);
-                    btn.innerText = '🔊';
-                    btn.disabled = false;
-                };
-                
-                audio.play().catch(err => {
-                    console.error("Audio playback failed", err);
-                    btn.innerText = '🔊';
-                    btn.disabled = false;
-                });
-            } catch (err) {
-                console.error(err);
-                showToast("Failed to play audio");
-                btn.innerText = '🔊';
-                btn.disabled = false;
-            }
-        }
-
         // Boot
-        document.addEventListener('DOMContentLoaded', checkVoiceStatus);
         initApp();
     </script>
 </body>

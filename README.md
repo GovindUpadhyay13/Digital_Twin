@@ -138,18 +138,15 @@ The system is constructed as a structured pipeline of modular subsystems. Rather
    copy .env.example .env
    ```
 
-### Voicebox TTS Integration (Optional)
+### Voicebox Setup (Optional Voice Feedback)
 
-To enable the cloned voice feedback feature, you must have the local Voicebox desktop application running:
-1. Open the Voicebox desktop app (running on `http://127.0.0.1:17493`).
-2. Create a Voice Profile named `karpathy` using the **Qwen3-TTS 1.7B** engine.
-3. Import the five high-quality audio references located under `data/voice_reference/` to train the profile.
-4. Retrieve your Profile ID by querying the profiles endpoint: `curl http://127.0.0.1:17493/profiles`
-5. Configure these variables inside your `.env` file:
-   ```env
-   VOICEBOX_BASE_URL=http://127.0.0.1:17493
-   VOICEBOX_PROFILE_ID=<your-cloned-profile-id>
-   ```
+To enable the voice feedback feature (spoken responses), follow these setup steps:
+1. Download Voicebox from [https://voicebox.sh](https://voicebox.sh).
+2. Open Voicebox, navigate to **Voice Profiles** → **Create New**.
+3. Name the profile exactly **"Andrej Karpathy"**.
+4. Upload 30–60 seconds of clean audio from one of Andrej's YouTube lectures (you can use one of the clips from `data/voice_reference/`).
+5. Click **Clone Voice** to train the profile.
+6. Toggle the **🔊 Voice** button to ON in the chatbot UI header, and make sure the Voicebox app is running in the background when using the Digital Twin.
 
 ### Ingestion & Data Preparation
 

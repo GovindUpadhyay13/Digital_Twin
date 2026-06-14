@@ -1,83 +1,118 @@
 import os
-import yaml
-from pathlib import Path
-from typing import Dict, Any
+import logging
+from typing import Dict, Any, AsyncGenerator
 
 from core.config_loader import load_config, load_env
-from rag.retriever import Retriever
-from memory.manager import MemoryManager
-from timeline.engine import TimelineEngine
-from core.prompt_builder import PromptBuilder
-from agent.persona_validator import PersonaValidator
-from agent.graph import build_graph
+from google import genai
+from google.genai import types
+
+logger = logging.getLogger(__name__)
 
 class KarpathyTwinOrchestrator:
-    def __init__(self, session_id: str = None, config_path: str = "config.yaml"):
-        # Load environment variables
+    retriever = None
+    
+    @classmethod
+    def initialize_global_retriever(cls, config_path: str = "config.yaml"):
+        """Initialize the single global retriever once to preload models/databases on startup"""
         load_env()
+        config = load_config(config_path)
+        rag_conf = config.get("rag", {})
         
-        # Load configuration
-        self.config = load_config(config_path)
-        
-        # Instantiate pipeline components
-        rag_conf = self.config.get("rag", {})
-        self.retriever = Retriever(
+        from rag.retriever import Retriever
+        cls.retriever = Retriever(
             model_name=rag_conf.get("embedding_model", "all-MiniLM-L6-v2"),
             persist_dir=rag_conf.get("persist_dir", "storage/chroma_db"),
             collection_name=rag_conf.get("collection_name", "karpathy_knowledge"),
-            top_k=rag_conf.get("top_k", 5),
-            boost_primary=rag_conf.get("boost_primary", 1.3)
+            top_k=5
         )
-        
-        self.memory = MemoryManager(session_id=session_id, config_path=config_path)
-        self.timeline = TimelineEngine()
-        self.prompt_builder = PromptBuilder()
-        self.validator = PersonaValidator()
-        
-        # Build compiled LangGraph
-        self.graph = build_graph(
-            retriever=self.retriever,
-            memory=self.memory,
-            timeline=self.timeline,
-            prompt_builder=self.prompt_builder,
-            validator=self.validator
-        )
-        
-        print(f"Digital Twin Orchestrator compiled successfully. Session ID: {self.memory.session_id}")
+        logger.info("Global RAG retriever initialized successfully.")
 
-    def chat(self, user_message: str, thread_id: str = "default_thread") -> Dict[str, Any]:
-        """
-        Runs the user query through the LangGraph agent state graph.
+    def __init__(self, session_id: str = None, config_path: str = "config.yaml"):
+        # Load environment variables
+        load_env()
+        self.session_id = session_id
         
-        Args:
-            user_message: Raw user query string.
-            thread_id: Unique thread identifier for conversation memory tracking.
+        # Ensure retriever is initialized
+        if self.retriever is None:
+            self.initialize_global_retriever(config_path)
             
-        Returns:
-            Dict containing the assistant response, matched sources, and validation states.
+        # simple in-memory list of last 8 messages as the conversation history
+        # Format: [{"role": "user"|"model", "text": str}]
+        self.history = []
+        
+        logger.info(f"Digital Twin Orchestrator initialized. Session ID: {self.session_id}")
+
+    async def chat_stream(self, user_message: str) -> AsyncGenerator[str, None]:
         """
-        inputs = {
-            "user_message": user_message,
-            "thread_id": thread_id,
-            "messages": [], # Will be restored by MemorySaver checkpoint
-            "system_prompt_cache": "",
-            "short_term_summary": "",
-            "is_valid": True,
-            "validation_issues": []
-        }
+        Retrieves context, calls Gemini using async streaming, yields text chunks, and saves to history.
+        """
+        # 1. Retrieve RAG context (top-5 cosine similarity)
+        results = self.retriever.retrieve(user_message, top_k=5)
+        rag_context = self.retriever.format_context(results)
         
-        config = {"configurable": {"thread_id": thread_id}}
+        # 2. Convert history to types.Content structure
+        contents = []
+        for h in self.history:
+            contents.append(types.Content(
+                role=h["role"],
+                parts=[types.Part.from_text(text=h["text"])]
+            ))
+            
+        # Layer current query with RAG context
+        current_user_content = f"""[RETRIEVED KNOWLEDGE FROM MY WORKS]
+{rag_context}
+
+[MY CURRENT QUESTION]
+{user_message}"""
+
+        contents.append(types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=current_user_content)]
+        ))
         
-        # Invoke state graph
-        state_output = self.graph.invoke(inputs, config)
+        # 3. Call Gemini async stream API
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            # Fallback if no API key is present
+            fallback_text = "Hey! It looks like the GEMINI_API_KEY is not set. Under the hood, I'm just a model waiting for its key. Please set it in your .env file."
+            yield fallback_text
+            self.history.append({"role": "user", "text": user_message})
+            self.history.append({"role": "model", "text": fallback_text})
+            self.history = self.history[-8:]
+            return
+
+        client = genai.Client(api_key=api_key)
+        from core.persona import get_system_prompt
+        system_instruction = get_system_prompt()
         
-        return {
-            "response": state_output.get("response", ""),
-            "sources": state_output.get("sources", []),
-            "is_valid": state_output.get("is_valid", True),
-            "validation_issues": state_output.get("validation_issues", [])
-        }
+        full_response_text = ""
+        try:
+            # We use client.aio for async calls
+            response_stream = await client.aio.models.generate_content_stream(
+                model="gemini-2.5-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.7,
+                    top_p=0.95,
+                )
+            )
+            
+            async for chunk in response_stream:
+                if chunk.text:
+                    full_response_text += chunk.text
+                    yield chunk.text
+                    
+        except Exception as e:
+            logger.error(f"Error during streaming generation: {e}", exc_info=True)
+            yield f"⚠️ [Error generating response: {e}]"
+            return
+            
+        # 4. Save to history (last 8 messages only)
+        self.history.append({"role": "user", "text": user_message})
+        self.history.append({"role": "model", "text": full_response_text})
+        self.history = self.history[-8:]
 
     def close(self):
-        """Close session and save episodic memory"""
-        self.memory.save_session()
+        """No persistent resources need saving with simple memory"""
+        pass
