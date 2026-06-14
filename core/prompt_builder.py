@@ -1,5 +1,5 @@
 from typing import List
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 
 class PromptBuilder:
     def build_prompt(
@@ -29,27 +29,30 @@ class PromptBuilder:
         """
         messages = []
         
-        # Add recent turns (conversation history)
+        # 1. Inject the system prompt
+        messages.append(SystemMessage(content=system_prompt))
+        
+        # 2. Inject context as a synthetic HumanMessage -> AIMessage pair
+        context_blocks = []
+        if rag_context:
+            context_blocks.append(f"[RETRIEVED KNOWLEDGE FROM MY WORKS]\n{rag_context}")
+        if timeline_context:
+            context_blocks.append(f"[CAREER TIMELINE INFORMATION]\n{timeline_context}")
+        if memory_context:
+            context_blocks.append(f"[CONTEXT FROM PREVIOUS CONVERSATIONS]\n{memory_context}")
+        if short_term_summary:
+            context_blocks.append(f"[RECENT SESSION SUMMARY]\n{short_term_summary}")
+            
+        if context_blocks:
+            messages.append(HumanMessage(content="[CONTEXT RETRIEVAL]"))
+            messages.append(AIMessage(content="\n\n".join(context_blocks)))
+            
+        # 3. Add recent turns (conversation history)
         if recent_turns:
             # Filter out any duplicate current messages to prevent loop
             messages.extend(recent_turns)
             
-        # Build the current user turn with layered context injection
-        # Gemini excels at handling this stuffed context within the prompt structure.
-        enriched_user_content = f"""[RETRIEVED KNOWLEDGE FROM MY WORKS]
-{rag_context}
-
-[CAREER TIMELINE INFORMATION]
-{timeline_context}
-
-[CONTEXT FROM PREVIOUS CONVERSATIONS]
-{memory_context}
-
-[RECENT SESSION SUMMARY]
-{short_term_summary if short_term_summary else "No prior summary for this session."}
-
-[MY CURRENT QUESTION]
-{user_query}"""
-
-        messages.append(HumanMessage(content=enriched_user_content))
+        # 4. Add the final user query
+        messages.append(HumanMessage(content=user_query))
+        
         return messages
